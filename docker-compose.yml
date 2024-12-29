@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    networks:
+      - traefik_default
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cod-rastreio-development-378914.rule=Host(`wecas.paginas.cloud`)
+      - traefik.http.routers.cod-rastreio-development-378914.entrypoints=websecure
+      - traefik.http.routers.cod-rastreio-development-378914.middlewares=cors-cod-rastreio-development-378914@docker
+      - traefik.http.routers.cod-rastreio-development-378914.tls.certresolver=letsencrypt
+      - traefik.http.routers.cod-rastreio-development-378914.service=cod-rastreio-development-378914
+      - traefik.http.services.cod-rastreio-development-378914.loadbalancer.server.port=3000
+      - traefik.http.middlewares.cors-cod-rastreio-development-378914.headers.customResponseHeaders.access-control-allow-origin=*
+      - traefik.http.middlewares.cors-cod-rastreio-development-378914.headers.customResponseHeaders.access-control-allow-credentials=true
+    restart: "always"
+    
+networks:
+  traefik_default:
+    external: true
