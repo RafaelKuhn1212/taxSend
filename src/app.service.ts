@@ -1,28 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 var privateKey = "admin_live_YuTvvox0zgoqUVsNQLRQovZmS0BW1u"
-
+import * as fs from 'fs'
 async function startFlowTypebotTENF(item, codigoRastreio) {
   var myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
 
 var raw = JSON.stringify({
   "prefilledVariables": {
-    email: item.customer.email,
-    name: item.customer.name,
-    phone: item.customer.phone,
-    codigoRastreio: codigoRastreio,
-    cep: item.customer?.address?.zipCode || "70872050",
-    data: new Date().toLocaleDateString(),
-    logoUrl: `https://s3.rastreou.org/cod-rastreio/sas.png`,
-    horario: new Date().toLocaleTimeString(),
-    endereco: item.customer.address?.street,
-    state: item.customer.address?.state,
-    valor: (item.amount / 100).toString(),
-    frete: ((item.shipping?.amount / 100 || 0) + 27.99).toString(),
-    storeName: "Refrete",
-    document: item.customer.document.number,
-    productsHtml: item.items.map((item) => {
+    "clientEmail": item.customer.email,
+    "clientName": item.customer.name,
+    "clientPhone": item.customer.phone,
+    "codigoRastreio": codigoRastreio,
+    "cep": item.customer?.address?.zipCode || "70872050",
+    "data": new Date().toLocaleDateString(),
+   "logoUrl": `https://s3.rastreou.org/cod-rastreio/sas.png`,
+    "horario": new Date().toLocaleTimeString(),
+    "endereco": item.customer.address?.street,
+    "state": item.customer.address?.state,
+    "valor": (item.amount / 100).toString(),
+    "frete": ((item.shipping?.amount / 100 || 0) + 17.98).toString(),
+    "storeName": "TaxaTenf",
+    "clientDocument": item.customer.document.number,
+    "productsHtml": item.items.map((item) => {
       return `
       <tr>
 <td style="border-collapse: collapse;"></td>
@@ -54,7 +54,6 @@ var raw = JSON.stringify({
   "isStreamEnabled": false,
   "textBubbleContentFormat": "richText"
 });
-
 const resp = await fetch("https://typechat.ads-information.top/api/v1/typebots/taxa-tenf-no-payment-dtk74jr/startChat", {
   method: 'POST',
   headers: myHeaders,
@@ -62,6 +61,7 @@ const resp = await fetch("https://typechat.ads-information.top/api/v1/typebots/t
   redirect: 'follow'
 })
 const data = await resp.json()
+console.log(data)
 if(resp.status == 200){
   return "ok"
 }
@@ -75,20 +75,21 @@ myHeaders.append("Content-Type", "application/json");
 
 var raw = JSON.stringify({
   "prefilledVariables": {
-    email: item.customer.email,
-    name: item.customer.name,
-    phone: item.customer.phone,
-    codigoRastreio: codigoRastreio,
-    cep: item.customer?.address?.zipCode || "70872050",
-    data: new Date().toLocaleDateString(),
-    logoUrl: `https://s3.rastreou.org/cod-rastreio/jadlog.png`,
-    horario: new Date().toLocaleTimeString(),
-    endereco: item.customer.address?.street,
-    state: item.customer.address?.state,
-    valor: (item.amount / 100).toString(),
-    frete: ((item.shipping?.amount / 100 || 0) + 27.99).toString(),
-    storeName: "Refrete",
-    productsHtml: item.items.map((item) => {
+    "clientEmail": item.customer.email,
+    "clientName": item.customer.name,
+    "clientPhone": item.customer.phone,
+    "clientDocument": item.customer.document.number,
+    "codigoRastreio": codigoRastreio,
+    "cep": item.customer?.address?.zipCode || "70872050",
+    "data": new Date().toLocaleDateString(),
+    "logoUrl": `https://s3.rastreou.org/cod-rastreio/jadlog.png`,
+    "horario": new Date().toLocaleTimeString(),
+    "endereco": item.customer.address?.street,
+    "state": item.customer.address?.state,
+    "valor": (item.amount / 100).toString(),
+    "frete": ((item.shipping?.amount / 100 || 0) + 27.99).toString(),
+    "storeName": "Refrete",
+    "productsHtml": item.items.map((item) => {
       return `
       <tr>
 <td style="border-collapse: collapse;"></td>
