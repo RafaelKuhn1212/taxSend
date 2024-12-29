@@ -140,25 +140,18 @@ throw new Error("Erro ao iniciar chat")
 }
 
 // @ts-ignore
-var agenda = new Agenda({
-  db: {
-    db: {
-      // address: 'mongodb://admin:%40Souumbbk1@185.209.230.133:27017/',
-      // collection: 'newIntegration4',
-      address: process.env.MONGO_URL,
-      collection: 'TaxAgenda',
-    },
-    processEvery: '15 seconds',
-    maxConcurrency: 20,
-  },
+var agenda = new Agenda({ db: { 
+  // address: "mongodb://admin:%40Souumbbk1@185.209.230.133:27017/",
+  // collection: 'newIntegration4',
+  address: process.env.MONGO_URL,
+  collection: 'TaxAgenda',
+},
 });
 
 const prisma = new PrismaClient()
 @Injectable()
 export class AppService {
-  constructor(
-
-    ) {}
+  constructor() {}
   async handle(body:any) {
     console.log("body", body.data.id)
     if(body.type == "transaction"){
