@@ -5,6 +5,7 @@ services:
       - traefik_default
     environment:
       - DATABASE_URL=postgresql://postgres:Souumbbk1@185.209.230.133:5432/tax
+      - MONGO_URL=mongodb://admin:%40Souumbbk1@185.209.230.133:27017
     labels:
       - traefik.enable=true
       - traefik.http.routers.cod-rastreio-development-2312.rule=Host(`wecas.paginas.cloud`)
