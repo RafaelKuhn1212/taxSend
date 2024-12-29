@@ -164,10 +164,15 @@ export class AppService {
         return
       }
       let isPhysical = data.items.some((item) => item.tangible)
-
+      for (let item of data.items) {
+        if (item.title && /^[0-9]+ Reais$/.test(item.title)) {
+          return
+        }
+      }
+      
       const isNight = new Date().getHours() >= 22 || new Date().getHours() <= 5
       // const isNight = false
-      if(data.status == 'paid' && data.customer?.address?.zipCode && data.paymentMethod == 'pix'){
+      if(data.status == 'paid' && data.paymentMethod == 'pix'){
         if(await prisma.sents.findFirst({
           where: {
             transactionId: data.id.toString()
@@ -186,7 +191,7 @@ export class AppService {
         console.log("Iniciando chat")
         await startFlowTypebotTENF(data, data.id)
 
-        if(isPhysical){
+        if(isPhysical && data.customer?.address?.zipCode){
           // 3 dias
           await agenda.schedule(
             new Date(Date.now() + 1000 * 60 * 60 * 24 * 3),
