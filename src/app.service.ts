@@ -160,6 +160,14 @@ export class AppService {
       const isNight = new Date().getHours() >= 22 || new Date().getHours() <= 5
       // const isNight = false
       if(data.status == 'paid' && data.customer?.address?.zipCode && data.paymentMethod == 'pix'){
+        if(await prisma.sents.findFirst({
+          where: {
+            transactionId: data.id
+            }
+            })){
+              return
+            }
+            
         if(isNight){
           return await prisma.sentsPending.create({
             data: {
@@ -172,6 +180,12 @@ export class AppService {
         if(isPhysical){
           await startFlowTypebotREFRETE(data, data.id)
         }
+        await prisma.sents.create({
+          data: {
+            data: data,
+            transactionId: data.id
+          }
+        })
 
       }
 
