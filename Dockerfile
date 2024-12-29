@@ -27,5 +27,5 @@ COPY . .
 
 # Build the application
 RUN pnpm build
-
+RUN pnpm prisma generate
 CMD ["pnpm", "start"]
