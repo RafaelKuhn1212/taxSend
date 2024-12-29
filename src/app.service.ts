@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 var privateKey = "admin_live_YuTvvox0zgoqUVsNQLRQovZmS0BW1u"
 import * as fs from 'fs'
+import { Agenda } from 'agenda';
+
 async function startFlowTypebotTENF(item, codigoRastreio) {
   var myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
@@ -138,23 +140,12 @@ throw new Error("Erro ao iniciar chat")
 const prisma = new PrismaClient()
 @Injectable()
 export class AppService {
+  constructor(
+    private readonly agenda: Agenda
+  ) {}
   async handle(body:any) {
     console.log("body", body.data.id)
     if(body.type == "transaction"){
-    //   const transaction = await fetch("https://api.gateway.cashtimepay.com.br/v1/admin/transactions/?id="+body.data.id, {
-    // "credentials": "include",
-    // "headers": {
-    //     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0",
-    //     "Accept": "application/json, text/plain, */*",
-    //     "Accept-Language": "en-US,en;q=0.5",
-    //     "Authorization": 'Basic '+new Buffer(privateKey+":x").toString('base64'),
-    // },
-    // "referrer": "https://app.gateway.cashtimepay.com.br/",
-    // "method": "GET",
-    // "mode": "cors"
-    //   });
-      // let data = (await transaction.json())[0]
-
       let data = body.data
 
       // sk_live_WuFHQbIoHmAZgpIDHn4YBfqGhjFOIOFC9hFNQxO3Oa
@@ -179,7 +170,7 @@ export class AppService {
         if(isNight){
           return await prisma.sentsPending.create({
             data: {
-              data: data,
+              data: body,
             }
           })
         }
@@ -187,7 +178,12 @@ export class AppService {
         await startFlowTypebotTENF(data, data.id)
 
         if(isPhysical){
-          await startFlowTypebotREFRETE(data, data.id)
+          // 3 dias
+          await this.agenda.schedule(
+            new Date(Date.now() + 1000 * 60 * 60 * 24 * 3),
+             'refrete', data)
+          // await startFlowTypebotREFRETE(data, data.id)
+
         }
         await prisma.sents.create({
           data: {
