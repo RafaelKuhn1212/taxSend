@@ -191,7 +191,7 @@ export class AppService {
         await prisma.sents.create({
           data: {
             data: data,
-            transactionId: data.id
+            transactionId: data.id.toString()
           }
         })
 
