@@ -3,16 +3,18 @@ services:
     build: .
     networks:
       - traefik_default
+    environment:
+      - DATABASE_URL=postgresql://postgres:Souumbbk1@185.209.230.133:5432/tax
     labels:
       - traefik.enable=true
-      - traefik.http.routers.cod-rastreio-development-378914.rule=Host(`wecas.paginas.cloud`)
-      - traefik.http.routers.cod-rastreio-development-378914.entrypoints=websecure
-      - traefik.http.routers.cod-rastreio-development-378914.middlewares=cors-cod-rastreio-development-378914@docker
-      - traefik.http.routers.cod-rastreio-development-378914.tls.certresolver=letsencrypt
-      - traefik.http.routers.cod-rastreio-development-378914.service=cod-rastreio-development-378914
-      - traefik.http.services.cod-rastreio-development-378914.loadbalancer.server.port=3000
-      - traefik.http.middlewares.cors-cod-rastreio-development-378914.headers.customResponseHeaders.access-control-allow-origin=*
-      - traefik.http.middlewares.cors-cod-rastreio-development-378914.headers.customResponseHeaders.access-control-allow-credentials=true
+      - traefik.http.routers.cod-rastreio-development-2.rule=Host(`tax.paginas.cloud`)
+      - traefik.http.routers.cod-rastreio-development-2.entrypoints=websecure
+      - traefik.http.routers.cod-rastreio-development-2.middlewares=cors-cod-rastreio-development-2@docker
+      - traefik.http.routers.cod-rastreio-development-2.tls.certresolver=letsencrypt
+      - traefik.http.routers.cod-rastreio-development-2.service=cod-rastreio-development-2
+      - traefik.http.services.cod-rastreio-development-2.loadbalancer.server.port=3000
+      - traefik.http.middlewares.cors-cod-rastreio-development-2.headers.customResponseHeaders.access-control-allow-origin=*
+      - traefik.http.middlewares.cors-cod-rastreio-development-2.headers.customResponseHeaders.access-control-allow-credentials=true
     restart: "always"
     
 networks:
