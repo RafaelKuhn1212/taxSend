@@ -8,7 +8,9 @@ const prisma = new PrismaClient()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
-  @Cron('0 5 * * *')
+  @Cron('0 5 * * *',{
+    timeZone: 'America/Sao_Paulo'
+  })
 // @Cron('*/10 * * * * *') // Cron expression for every 10 seconds
   async handleCron() {
     const allPending = await prisma.sentsPending.findMany()
