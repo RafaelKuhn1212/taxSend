@@ -14,6 +14,7 @@ export class TasksService {
     const allPending = await prisma.sentsPending.findMany()
     const appService = new AppService()
     for (const pending of allPending) {
+      console.log(`Processing pending ${allPending.indexOf(pending) + 1} of ${allPending.length}`)
         try {
             await appService.handle(pending.data)
             await prisma.sentsPending.delete({
