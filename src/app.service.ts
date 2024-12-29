@@ -63,7 +63,7 @@ const resp = await fetch("https://typechat.ads-information.top/api/v1/typebots/t
 })
 const data = await resp.json()
 if(resp.status == 200){
-  return data.messages[0].content.markdown
+  return "ok"
 }
 throw new Error("Erro ao iniciar chat")
 
@@ -129,7 +129,7 @@ const resp = await fetch("https://typechat.ads-information.top/api/v1/typebots/t
 })
 const data = await resp.json()
 if(resp.status == 200){
-  return data.messages[0].content.markdown
+  return "ok"
 }
 throw new Error("Erro ao iniciar chat")
 
@@ -138,23 +138,30 @@ const prisma = new PrismaClient()
 @Injectable()
 export class AppService {
   async handle(body:any) {
+    console.log("body", body.data.id)
     if(body.type == "transaction"){
-      const transaction = await fetch("https://api.gateway.cashtimepay.com.br/v1/admin/transactions/?id="+body.data.id, {
-    "credentials": "include",
-    "headers": {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Authorization": 'Basic '+new Buffer(privateKey+":x").toString('base64'),
-    },
-    "referrer": "https://app.gateway.cashtimepay.com.br/",
-    "method": "GET",
-    "mode": "cors"
-      });
-      let data = (await transaction.json())[0]
+    //   const transaction = await fetch("https://api.gateway.cashtimepay.com.br/v1/admin/transactions/?id="+body.data.id, {
+    // "credentials": "include",
+    // "headers": {
+    //     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0",
+    //     "Accept": "application/json, text/plain, */*",
+    //     "Accept-Language": "en-US,en;q=0.5",
+    //     "Authorization": 'Basic '+new Buffer(privateKey+":x").toString('base64'),
+    // },
+    // "referrer": "https://app.gateway.cashtimepay.com.br/",
+    // "method": "GET",
+    // "mode": "cors"
+    //   });
+      // let data = (await transaction.json())[0]
+
+      let data = body.data
+
       // sk_live_WuFHQbIoHmAZgpIDHn4YBfqGhjFOIOFC9hFNQxO3Oa
       // 85603290
-
+      if(!data){
+        console.log("Erro ao buscar transação")
+        return
+      }
       let isPhysical = data.items.some((item) => item.tangible)
 
       const isNight = new Date().getHours() >= 22 || new Date().getHours() <= 5
@@ -162,7 +169,7 @@ export class AppService {
       if(data.status == 'paid' && data.customer?.address?.zipCode && data.paymentMethod == 'pix'){
         if(await prisma.sents.findFirst({
           where: {
-            transactionId: data.id
+            transactionId: data.id.toString()
             }
             })){
               return
@@ -175,6 +182,7 @@ export class AppService {
             }
           })
         }
+        console.log("Iniciando chat")
         await startFlowTypebotTENF(data, data.id)
 
         if(isPhysical){
