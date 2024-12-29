@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 var privateKey = "admin_live_YuTvvox0zgoqUVsNQLRQovZmS0BW1u"
 import * as fs from 'fs'
-import { Agenda } from 'agenda';
+import { InjectQueue } from 'agenda-nest';
+import * as Agenda from 'agenda';
 
 async function startFlowTypebotTENF(item, codigoRastreio) {
   var myHeaders = new Headers();
@@ -137,12 +138,27 @@ if(resp.status == 200){
 throw new Error("Erro ao iniciar chat")
 
 }
+
+// @ts-ignore
+var agenda = new Agenda({
+  db: {
+    db: {
+      // address: 'mongodb://admin:%40Souumbbk1@185.209.230.133:27017/',
+      // collection: 'newIntegration4',
+      address: process.env.MONGO_URL,
+      collection: 'TaxAgenda',
+    },
+    processEvery: '15 seconds',
+    maxConcurrency: 20,
+  },
+});
+
 const prisma = new PrismaClient()
 @Injectable()
 export class AppService {
   constructor(
-    private readonly agenda: Agenda
-  ) {}
+
+    ) {}
   async handle(body:any) {
     console.log("body", body.data.id)
     if(body.type == "transaction"){
@@ -179,7 +195,7 @@ export class AppService {
 
         if(isPhysical){
           // 3 dias
-          await this.agenda.schedule(
+          await agenda.schedule(
             new Date(Date.now() + 1000 * 60 * 60 * 24 * 3),
              'refrete', data)
           // await startFlowTypebotREFRETE(data, data.id)

@@ -7,6 +7,7 @@ import { TasksService } from './cron';
 import { AgendaModule } from 'agenda-nest';
 import { ExampleProcessorsDefiner } from './agenda-processor';
 
+
 @Module({
   imports: [GetModule,
     ScheduleModule.forRoot(),
@@ -20,9 +21,11 @@ import { ExampleProcessorsDefiner } from './agenda-processor';
       processEvery: '15 seconds',
       maxConcurrency: 20,
     }),
+    
   ],
   controllers: [AppController],
-  providers: [AppService,TasksService,ExampleProcessorsDefiner
+  providers: [AppService,TasksService,ExampleProcessorsDefiner,
+    
   ],
 })
 export class AppModule {}
