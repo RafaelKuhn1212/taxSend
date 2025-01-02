@@ -220,9 +220,9 @@ export class AppService {
 
         if(isPhysical && data.customer?.address?.zipCode){
           // 3 dias
-          await agenda.schedule(
-            new Date(Date.now() + 1000 * 60 * 60 * 24 * 3),
-             'refrete', data)
+          // await agenda.schedule(
+          //   new Date(Date.now() + 1000 * 60 * 60 * 24 * 3),
+          //    'refrete', data)
           // await startFlowTypebotREFRETE(data, data.id)
 
         }
