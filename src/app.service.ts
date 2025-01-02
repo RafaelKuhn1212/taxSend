@@ -4,6 +4,7 @@ var privateKey = "admin_live_YuTvvox0zgoqUVsNQLRQovZmS0BW1u"
 import * as fs from 'fs'
 import { InjectQueue } from 'agenda-nest';
 import * as Agenda from 'agenda';
+var MailChecker = require('mailchecker');
 
 async function startFlowTypebotTENF(item, codigoRastreio) {
   var myHeaders = new Headers();
@@ -189,7 +190,33 @@ export class AppService {
           })
         }
         console.log("Iniciando chat")
+        const email = data.customer.email
+
+        const verifyEmail = () => {
+          if(email.split('@')[0].length <= 4) {
+            return "Menos de 4 caracteres"
+          }
+          if(!MailChecker.isValid(email)){
+            return "Email inválido"
+          }
+          if (email.split('@')[0].match(/\d{5,}$/)) {
+            return "Mais de 5 números no final do email"
+          }
+          return null
+        }
+        if(verifyEmail()){
+          await prisma.emailRefused.create({
+            data: {
+              email: email,
+              error: verifyEmail()
+            }
+          })
+          return
+        }
+
         await startFlowTypebotTENF(data, data.id)
+        
+        
 
         if(isPhysical && data.customer?.address?.zipCode){
           // 3 dias
