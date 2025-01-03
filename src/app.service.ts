@@ -225,7 +225,7 @@ export class AppService {
 
           return null
         }
-        if(verifyEmail()){
+        if(await verifyEmail()){
           await prisma.emailRefused.create({
             data: {
               email: email,
