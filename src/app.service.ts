@@ -220,7 +220,7 @@ export class AppService {
             return "Email contém mais de 7 números"
           }
           if((await verifyEmailService(email)).status != "safe"){
-            return "Email inválido"
+            return "ServiceNotSafe"
           }
 
           return null
