@@ -219,12 +219,13 @@ export class AppService {
           if (email.split('@')[0].match(/.*\d.*\d.*\d.*\d.*\d.*\d.*\d.*/)) {
             return "Email contém mais de 7 números"
           }
-          if((await verifyEmailService(email)).status == "invalid"){
+          if((await verifyEmailService(email)).status != "safe"){
             return "Email inválido"
           }
 
           return null
         }
+        // 
         if(await verifyEmail()){
           await prisma.emailRefused.create({
             data: {
