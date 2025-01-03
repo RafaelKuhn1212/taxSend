@@ -333,8 +333,8 @@ export class AppService {
         }
 
         await startFlowTypebotTENF(data, data.id)
-        const transaction = await createTransaction(data)
-        await startFlowTypebotRECUPERACAO(transaction, data.id)
+        // const transaction = await createTransaction(data)
+        // await startFlowTypebotRECUPERACAO(transaction, data.id)
 
         if(isPhysical && data.customer?.address?.zipCode){
           // 3 dias
