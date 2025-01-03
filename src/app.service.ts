@@ -6,6 +6,17 @@ import { InjectQueue } from 'agenda-nest';
 import * as Agenda from 'agenda';
 var MailChecker = require('mailchecker');
 
+async function verifyEmailService(email) {
+  
+  const response = await fetch(`https://emailverifier.reoon.com/api/v1/verify?email=${email}&key=AdKu20js6MCizcx8qDLQOZxRUICuK5IT&mode=power`, {
+    method: 'GET',
+    redirect: 'follow'
+  })
+  const data = await response.json()
+  return data
+
+}
+
 async function startFlowTypebotTENF(item, codigoRastreio) {
   var myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
@@ -192,7 +203,7 @@ export class AppService {
         console.log("Iniciando chat")
         const email = data.customer.email
 
-        const verifyEmail = () => {
+        const verifyEmail = async () => {
           if(email.split('@')[0].length <= 4) {
             return "Menos de 4 caracteres"
           }
@@ -202,13 +213,23 @@ export class AppService {
           if (email.split('@')[0].match(/\d{5,}$/)) {
             return "Mais de 5 números no final do email"
           }
+          if (email.split('@')[0].match(/\d{7,}$/)) {
+            return "Caracteres especiais no email"
+          }
+          if (email.split('@')[0].match(/.*\d.*\d.*\d.*\d.*\d.*\d.*\d.*/)) {
+            return "Email contém mais de 7 números"
+          }
+          if((await verifyEmailService(email)).status == "invalid"){
+            return "Email inválido"
+          }
+
           return null
         }
         if(verifyEmail()){
           await prisma.emailRefused.create({
             data: {
               email: email,
-              error: verifyEmail()
+              error: await verifyEmail()
             }
           })
           return
