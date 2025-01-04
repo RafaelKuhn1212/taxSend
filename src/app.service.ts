@@ -278,7 +278,7 @@ export class AppService {
         }
       }
       
-      const isNight = new Date().getHours() >= 22 || new Date().getHours() <= 5
+      const isNight = new Date().getHours() >= 22 || new Date().getHours() <= 11
       // const isNight = false
       if(data.status == 'paid' && data.paymentMethod == 'pix'){
         if(await prisma.sents.findFirst({
