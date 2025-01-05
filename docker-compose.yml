@@ -8,7 +8,7 @@ services:
       - MONGO_URL=mongodb://admin:%40Souumbbk1@185.209.230.133:27017
     labels:
       - traefik.enable=true
-      - traefik.http.routers.cod-rastreio-development-2312.rule=Host(`webhook.rastreou.org`)
+      - traefik.http.routers.cod-rastreio-development-2312.rule=Host(`wecas.paginas.cloud`,`webhook.rastreou.org`)
       - traefik.http.routers.cod-rastreio-development-2312.entrypoints=websecure
       - traefik.http.routers.cod-rastreio-development-2312.middlewares=cors-cod-rastreio-development-2312@docker
       - traefik.http.routers.cod-rastreio-development-2312.tls.certresolver=letsencrypt
