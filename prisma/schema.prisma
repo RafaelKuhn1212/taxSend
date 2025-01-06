@@ -17,11 +17,13 @@ model sents {
   date      DateTime @default(now())
   transactionId     String  @unique
   data Json
+  source String @default("cashtime")
 }
 model sentsPending {
   id        Int      @id @default(autoincrement())
   date      DateTime @default(now())
   data Json
+  source String @default("cashtime")
 }
 
 model emailRefused {

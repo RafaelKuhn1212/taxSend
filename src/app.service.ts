@@ -262,7 +262,7 @@ const prisma = new PrismaClient()
 @Injectable()
 export class AppService {
   constructor() {}
-  async handle(body:Body) {
+  async handle(body:Body, source:string) {
     console.log("body", body.data.id)
     if(body.type == "transaction"){
       let data = body.data
@@ -280,8 +280,8 @@ export class AppService {
         }
       }
       
-      const isNight = new Date().getHours() >= 22 || new Date().getHours() <= 11
-      // const isNight = false
+      // const isNight = new Date().getHours() >= 22 || new Date().getHours() <= 11
+      const isNight = false
       if(data.status == 'paid' && data.paymentMethod == 'pix'){
         if(await prisma.sents.findFirst({
           where: {
@@ -295,6 +295,7 @@ export class AppService {
           return await prisma.sentsPending.create({
             data: {
               data: body as any,
+              source: source
             }
           })
         }
@@ -348,7 +349,8 @@ export class AppService {
         await prisma.sents.create({
           data: {
             data: data,
-            transactionId: data.id.toString()
+            transactionId: data.id.toString(),
+            source: source
           }
         })
 

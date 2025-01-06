@@ -143,6 +143,10 @@ const sources = [
   {
     "name": "cashtime",
     "paymentLink": "https://pay.br-envio.lat/1VOvGVroo15GD62"
+  },
+  {
+    "name": "fivepagamentos",
+    "paymentLink": ""
   }
 ]
 const isSource = (source) => {
@@ -160,13 +164,15 @@ export class AppController {
   @Query('source') sourceP: string,
   ) {
 
-    if(sourceP == undefined || sourceP == null || sourceP == "") sourceP = 'cashtime'
+    if(sourceP == undefined || sourceP == null || sourceP == "") sourceP = 'fivepagamentos'
     if(!isSource(sourceP)) return "Invalid source"
     const {paymentLink} = sources.find((source) => source.name == sourceP)
     body.paymentLink = paymentLink
     switch(sourceP){
       case "cashtime":
-        return await this.appService.handle(body)
+        return await this.appService.handle(body,sourceP)
+     // case "fivepagamentos":
+       // return await this.appService.handle(body,sourceP)
     }
   }
 }

@@ -23,7 +23,7 @@ export class TasksService {
     for (const pending of allPending) {
       console.log(`Processing pending ${allPending.indexOf(pending) + 1} of ${allPending.length}`)
         try {
-            await appService.handle(pending.data)
+            await appService.handle(pending.data as any, pending.source)
             await prisma.sentsPending.delete({
                 where: {
                   id: pending.id
