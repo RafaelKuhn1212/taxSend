@@ -4,6 +4,7 @@ var privateKey = "admin_live_YuTvvox0zgoqUVsNQLRQovZmS0BW1u"
 import * as fs from 'fs'
 import { InjectQueue } from 'agenda-nest';
 import * as Agenda from 'agenda';
+import { Body } from './body';
 var MailChecker = require('mailchecker');
 
 async function verifyEmailService(email) {
@@ -30,6 +31,7 @@ var raw = JSON.stringify({
     "cep": item.customer?.address?.zipCode || "70872050",
     "data": new Date().toLocaleDateString(),
    "logoUrl": `https://s3.rastreou.org/cod-rastreio/sas.png`,
+   "paymentLink": item.paymentLink,
     "horario": new Date().toLocaleTimeString(),
     "endereco": item.customer.address?.street,
     "state": item.customer.address?.state,
@@ -260,7 +262,7 @@ const prisma = new PrismaClient()
 @Injectable()
 export class AppService {
   constructor() {}
-  async handle(body:any) {
+  async handle(body:Body) {
     console.log("body", body.data.id)
     if(body.type == "transaction"){
       let data = body.data
@@ -292,7 +294,7 @@ export class AppService {
         if(isNight){
           return await prisma.sentsPending.create({
             data: {
-              data: body,
+              data: body as any,
             }
           })
         }
@@ -331,16 +333,15 @@ export class AppService {
           })
           return
         }
-
         await startFlowTypebotTENF(data, data.id)
         // const transaction = await createTransaction(data)
         // await startFlowTypebotRECUPERACAO(transaction, data.id)
 
         if(isPhysical && data.customer?.address?.zipCode){
           // 3 dias
-          // await agenda.schedule(
-          //   new Date(Date.now() + 1000 * 60 * 60 * 24 * 3),
-          //    'refrete', data)
+          await agenda.schedule(
+            new Date(Date.now() + 1000 * 60 * 60 * 24 * 3),
+             'refrete', data)
           // await startFlowTypebotREFRETE(data, data.id)
 
         }

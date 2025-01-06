@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 import * as mongodb from 'mongodb'
 import * as Minio from 'minio'
@@ -139,13 +139,34 @@ throw new Error("Erro ao iniciar chat")
 
 }
 const prisma = new PrismaClient()
+const sources = [
+  {
+    "name": "cashtime",
+    "paymentLink": "https://pay.br-envio.lat/1VOvGVroo15GD62"
+  }
+]
+const isSource = (source) => {
+  return sources.map((source) => source.name).includes(source)
+}
+
+
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
   // Set status to 200
   @Post()
   @HttpCode(201)
-  async getHello(@Body() body: any) {
-    await this.appService.handle(body)
+  async getHello(@Body() body: any, 
+  @Query('source') sourceP: string,
+  ) {
+
+    if(sourceP == undefined || sourceP == null || sourceP == "") sourceP = 'cashtime'
+    if(!isSource(sourceP)) return "Invalid source"
+    const {paymentLink} = sources.find((source) => source.name == sourceP)
+    body.paymentLink = paymentLink
+    switch(sourceP){
+      case "cashtime":
+        return await this.appService.handle(body)
+    }
   }
 }

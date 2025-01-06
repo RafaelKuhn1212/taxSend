@@ -15,6 +15,7 @@ import {
       "clientPhone": item.customer.phone,
       "clientDocument": item.customer.document.number,
       "codigoRastreio": codigoRastreio,
+      "paymentLink": item.paymentLink,
       "cep": item.customer?.address?.zipCode || "70872050",
       "data": new Date().toLocaleDateString(),
       "logoUrl": `https://s3.rastreou.org/cod-rastreio/jadlog.png`,

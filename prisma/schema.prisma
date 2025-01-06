@@ -30,3 +30,4 @@ model emailRefused {
   email String
   error String
 }
+
