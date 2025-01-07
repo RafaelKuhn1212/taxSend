@@ -221,13 +221,14 @@ export class AppService {
       const isNight = new Date().getHours() >= 22 || new Date().getHours() <= 11
       // const isNight = false
       if(data.status == 'paid' && data.paymentMethod == 'pix'){
-        if(await prisma.sents.findFirst({
-          where: {
-            transactionId: data.id.toString()
-            }
-            })){
-              return
-            }
+        // if(await prisma.sents.findFirst({
+        //   where: {
+        //     transactionId: data.id.toString()
+        //     }
+        //     })){
+        //       console.log("Email já enviado hoje")
+        //       return
+        //     }
 
             const productsNames = data.items.map((item) => item.title);
             
@@ -265,6 +266,7 @@ export class AppService {
               return "Email já enviado hoje com os mesmos produtos";
             }
         if(isNight){
+          console.log("Is night")
           return await prisma.sentsPending.create({
             data: {
               data: body as any,
@@ -274,8 +276,6 @@ export class AppService {
         }
         console.log("Iniciando chat")
         const email = data.customer.email
-
-
 
         const verifyEmail = async () => {
           if(email.split('@')[0].length <= 4) {
