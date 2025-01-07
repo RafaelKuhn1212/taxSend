@@ -217,9 +217,12 @@ export class AppService {
           return
         }
       }
+
+      const saoPauloTime = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
       
-      // const isNight = new Date().getHours() >= 22 || new Date().getHours() <= 11
-      const isNight = false
+      const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
+      
+      // const isNight = f
       if(data.status == 'paid' && data.paymentMethod == 'pix'){
         // if(await prisma.sents.findFirst({
         //   where: {

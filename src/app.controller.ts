@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Query, Req } from '@nestjs/common';
 import { AppService } from './app.service';
 import * as mongodb from 'mongodb'
 import * as Minio from 'minio'
@@ -47,7 +47,11 @@ export class AppController {
   @HttpCode(201)
   async getHello(@Body() body: any, 
   @Query('source') sourceP: string,
+  @Req() req: Request
   ) {
+    const domain = req.headers?.host; // This will give the domain (host) making the request
+
+    console.log('Request domain:', domain);
 
     if(sourceP == undefined || sourceP == null || sourceP == "") sourceP = 'fivepagamentos'
     console.log(sourceP)
