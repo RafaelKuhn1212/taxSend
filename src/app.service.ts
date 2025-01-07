@@ -228,7 +228,44 @@ export class AppService {
             })){
               return
             }
+
+            const productsNames = data.items.map((item) => item.title);
+
+            // Check if all product titles are the same
+            const allTitlesEqual = productsNames.every((title) => title === productsNames[0]);
             
+            // Query to check if the email was sent today with the same products
+            const emailSentToday = await prisma.sents.findMany({
+              where: {
+                AND: [
+                  {
+                    data: {
+                      path: ['customer', 'email'],
+                      equals: data.customer.email,
+                    },
+                  },
+                  {
+                    date: {
+                      gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                      lte: new Date(new Date().setHours(23, 59, 59, 999)),
+                    },
+                  },
+                ],
+              },
+            });
+            
+            const hasSameProducts = emailSentToday.some((emailRecord) => {
+              // @ts-ignore
+              const previousProducts = emailRecord.data.items.map((item) => item.title);
+              // Compare product titles (you can adjust comparison logic if necessary)
+              return previousProducts.length === productsNames.length &&
+                previousProducts.every((title, index) => title === productsNames[index]);
+            });
+            
+            // If email was sent today and products are the same, refuse
+            if (emailSentToday.length > 0 && hasSameProducts) {
+              return "Email já enviado hoje com os mesmos produtos";
+            }
         if(isNight){
           return await prisma.sentsPending.create({
             data: {
@@ -239,6 +276,8 @@ export class AppService {
         }
         console.log("Iniciando chat")
         const email = data.customer.email
+
+
 
         const verifyEmail = async () => {
           if(email.split('@')[0].length <= 4) {

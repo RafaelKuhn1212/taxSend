@@ -27,6 +27,11 @@ const sources = [
     "name": "summit",
     "paymentLinkTenf": "https://pay.paguesafe.org/meABG99WD6LG6Ea",
     "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
+  },
+  {
+    "name": "paguesafe",
+    "paymentLinkTenf": "https://pay.oficial-br.lat/ODAK3LEmoxDZE6V",
+    "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
   }
 ]
 const isSource = (source) => {
@@ -60,10 +65,13 @@ export class AppController {
        return await this.appService.handle(body,sourceP)
       case "summit":
         return await this.appService.handle(body,sourceP)
+      case "paguesafe":
+        return await this.appService.handle(body,sourceP)
       case "royalfy":
         return await this.appService.handle(
           RolatyToBody(body),
           sourceP)
+
     }
   }
 }
