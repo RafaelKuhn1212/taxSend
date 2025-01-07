@@ -50,9 +50,8 @@ export class AppController {
   @Req() req: Request
   ) {
     // @ts-ignore
-    const domain = req.headers?.host; // This will give the domain (host) making the request
 
-    console.log('Request domain:', domain);
+    console.log('Request domain:', req.headers);
 
     if(sourceP == undefined || sourceP == null || sourceP == "") sourceP = 'fivepagamentos'
     console.log(sourceP)

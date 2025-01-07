@@ -199,6 +199,8 @@ export class AppService {
   constructor() {}
   async handle(body:BodyDTO, source:string) {
     console.log("body", body.data.id)
+    // @ts-ignore
+    console.log(body.data.postbackUrl)
     if(body.type == "transaction"){
       let data = body.data
       // @ts-ignore
