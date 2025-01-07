@@ -230,9 +230,6 @@ export class AppService {
             }
 
             const productsNames = data.items.map((item) => item.title);
-
-            // Check if all product titles are the same
-            const allTitlesEqual = productsNames.every((title) => title === productsNames[0]);
             
             // Query to check if the email was sent today with the same products
             const emailSentToday = await prisma.sents.findMany({
@@ -264,6 +261,7 @@ export class AppService {
             
             // If email was sent today and products are the same, refuse
             if (emailSentToday.length > 0 && hasSameProducts) {
+              console.log("Email já enviado hoje com os mesmos produtos");
               return "Email já enviado hoje com os mesmos produtos";
             }
         if(isNight){
