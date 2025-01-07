@@ -1,1 +1,100 @@
-{"prefilledVariables":{"email":"leonildosilva198105@gmail.com","name":"Leonildo Augusto Almeida da Silva","phone":"98989314030","codigoRastreio":85690055,"cep":"65150000","data":"12/29/2024","logoUrl":"https://s3.rastreou.org/cod-rastreio/sas.png","horario":"1:53:00 PM","endereco":"BR 402 KM 22 povoado Bom tempo Rosário Maranhão","state":"MA","valor":"37.55","frete":"27.99","storeName":"Refrete","document":"65107985300","productsHtml":"\n      <tr>\n<td style=\"border-collapse: collapse;\"></td>\n</tr>\n<tr>\n<td style=\"border-collapse: collapse; width: 75px;\">\n<img src=\"https://s3.rastreou.org/cod-rastreio/placeholder.png\"\n    style=\"width:50px; border: 2px solid; border-radius: 10px;\">\n</td>\n<td style=\"border-collapse: collapse;\">\n<p\n    style=\"font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282\">\n    <strong>\n      Samsung Galaxy S24 Ultra Dual eSIM 5G Dual SIM 256 GB Preto 12 GB RAM\n    </strong></p>\n<p\n    style=\"font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282\">\n    1 un. x R$&nbsp;37.55</p>\n</td>\n</tr>\n\n<tr>\n<td style=\"border-collapse: collapse;\"></td>\n</tr>\n      "},"isOnlyRegistering":false,"isStreamEnabled":false,"textBubbleContentFormat":"richText"}
+{
+    "id": 85684555,
+    "ip": null,
+    "fee": {
+        "netAmount": 2182,
+        "fixedAmount": 95,
+        "estimatedFee": 215,
+        "spreadPercentage": 4.99
+    },
+    "pix": {
+        "qrcode": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/f4517605-90a5-44b8-99c7-0d7bb336748d5204000053039865802BR5925CASH_TIME_PAY_PRODUTOS_E_6007GOIANIA62070503***63044093",
+        "end2EndId": "E60701190202412291616DY5DLR0XKSP",
+        "receiptUrl": null,
+        "expirationDate": "2024-12-30"
+    },
+    "card": null,
+    "items": [
+        {
+            "title": "iPhone 15 Pro 256GB Branco Titânio",
+            "quantity": 1,
+            "tangible": true,
+            "unitPrice": 2397,
+            "externalRef": null
+        }
+    ],
+    "payer": null,
+    "amount": 2397,
+    "boleto": null,
+    "origin": null,
+    "paidAt": "2024-12-29T16:16:41.000Z",
+    "splits": [
+        {
+            "amount": 2397,
+            "netAmount": 2182,
+            "recipientId": 52176,
+            "chargeProcessingFee": true
+        }
+    ],
+    "status": "paid",
+    "refunds": [],
+    "customer": {
+        "id": 42246657,
+        "name": "Misael da Silva Ribeiro",
+        "email": "m@gmail.com",
+        "phone": "81986684138",
+        "address": {
+            "city": "Jaboatão dos Guararapes",
+            "state": "PE",
+            "street": "Rua Coronel Sucupira",
+            "country": "BR",
+            "zipCode": "54300122",
+            "complement": null,
+            "neighborhood": "Zumbi do Pacheco",
+            "streetNumber": "65"
+        },
+        "document": {
+            "type": "cpf",
+            "number": "35210940497"
+        },
+        "birthdate": null,
+        "createdAt": "2024-08-17T10:56:23.000Z",
+        "externalRef": null
+    },
+    "delivery": {
+        "status": "waiting",
+        "createdAt": "2024-12-29T16:15:23.000Z",
+        "updatedAt": "2024-12-29T16:15:23.000Z",
+        "trackingCode": null
+    },
+    "metadata": "{\"provider\":\"Vega Checkout\",\"user_identitication_number\":\"56.227.645\\/0001-16\",\"user_email\":\"pedrozlehr@gmail.com\",\"sell_url\":\"https:\\/\\/pagonline.fr\",\"order_url\":\"https:\\/\\/pay.pagonline.fr\\/order\\/gzX8neEZ\",\"referrer_link\":\"https:\\/\\/recentesnoticia.fr\\/\"}",
+    "secureId": "adbd5983-153a-4128-9241-518d6ebc5492",
+    "shipping": {
+        "fee": 0,
+        "address": {
+            "city": "Jaboatão dos Guararapes",
+            "state": "PE",
+            "street": "Rua Coronel Sucupira",
+            "country": "BR",
+            "zipCode": "54300122",
+            "complement": null,
+            "neighborhood": "Zumbi do Pacheco",
+            "streetNumber": "65"
+        }
+    },
+    "basePrice": null,
+    "companyId": 37170,
+    "createdAt": "2024-12-29T16:15:23.000Z",
+    "secureUrl": "https://link.gateway.cashtimepay.com.br/pagar/adbd5983-153a-4128-9241-518d6ebc5492",
+    "traceable": true,
+    "updatedAt": "2024-12-29T16:16:41.000Z",
+    "paidAmount": 2397,
+    "externalRef": "gzX8neEZ",
+    "postbackUrl": null,
+    "installments": 1,
+    "interestRate": null,
+    "paymentMethod": "pix",
+    "refusedReason": null,
+    "refundedAmount": 0,
+    "authorizationCode": null
+}
