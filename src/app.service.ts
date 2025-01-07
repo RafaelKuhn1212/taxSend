@@ -4,7 +4,7 @@ var privateKey = "admin_live_YuTvvox0zgoqUVsNQLRQovZmS0BW1u"
 import * as fs from 'fs'
 import { InjectQueue } from 'agenda-nest';
 import * as Agenda from 'agenda';
-import { Body } from './body';
+import { BodyDTO } from './body';
 var MailChecker = require('mailchecker');
 
 async function verifyEmailService(email) {
@@ -21,7 +21,6 @@ async function verifyEmailService(email) {
 async function startFlowTypebotTENF(item, codigoRastreio) {
   var myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
-
 var raw = JSON.stringify({
   "prefilledVariables": {
     "clientEmail": item.customer.email,
@@ -30,8 +29,10 @@ var raw = JSON.stringify({
     "codigoRastreio": codigoRastreio,
     "cep": item.customer?.address?.zipCode || "70872050",
     "data": new Date().toLocaleDateString(),
-   "logoUrl": `https://s3.rastreou.org/cod-rastreio/sas.png`,
-   "paymentLink": item.paymentLink,
+    "logoUrl": `https://s3.rastreou.org/cod-rastreio/sas.png`,
+   
+    "paymentLink": item.paymentLinkTenf,
+
     "horario": new Date().toLocaleTimeString(),
     "endereco": item.customer.address?.street,
     "state": item.customer.address?.state,
@@ -86,72 +87,6 @@ throw new Error("Erro ao iniciar chat")
 
 }
 
-async function startFlowTypebotREFRETE(item, codigoRastreio) {
-  var myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
-
-var raw = JSON.stringify({
-  "prefilledVariables": {
-    "clientEmail": item.customer.email,
-    "clientName": item.customer.name,
-    "clientPhone": item.customer.phone,
-    "clientDocument": item.customer.document.number,
-    "codigoRastreio": codigoRastreio,
-    "cep": item.customer?.address?.zipCode || "70872050",
-    "data": new Date().toLocaleDateString(),
-    "logoUrl": `https://s3.rastreou.org/cod-rastreio/jadlog.png`,
-    "horario": new Date().toLocaleTimeString(),
-    "endereco": item.customer.address?.street,
-    "state": item.customer.address?.state,
-    "valor": (item.amount / 100).toString(),
-    "frete": ((item.shipping?.amount / 100 || 0) + 27.99).toString(),
-    "storeName": "Refrete",
-    "productsHtml": item.items.map((item) => {
-      return `
-      <tr>
-<td style="border-collapse: collapse;"></td>
-</tr>
-<tr>
-<td style="border-collapse: collapse; width: 75px;">
-<img src="https://s3.rastreou.org/cod-rastreio/placeholder.png"
-    style="width:50px; border: 2px solid; border-radius: 10px;">
-</td>
-<td style="border-collapse: collapse;">
-<p
-    style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">
-    <strong>
-      ${item.title}
-    </strong></p>
-<p
-    style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">
-    ${item.quantity} un. x R$&nbsp;${item.unitPrice/100}</p>
-</td>
-</tr>
-
-<tr>
-<td style="border-collapse: collapse;"></td>
-</tr>
-      `
-    }).join("\n")
-  },
-  "isOnlyRegistering": false,
-  "isStreamEnabled": false,
-  "textBubbleContentFormat": "richText"
-});
-
-const resp = await fetch("https://typechat.ads-information.top/api/v1/typebots/taxa-tenf-no-payment-7x6xv4s/startChat", {
-  method: 'POST',
-  headers: myHeaders,
-  body: raw,
-  redirect: 'follow'
-})
-const data = await resp.json()
-if(resp.status == 200){
-  return "ok"
-}
-throw new Error("Erro ao iniciar chat")
-
-}
 
 async function startFlowTypebotRECUPERACAO(item, codigoRastreio) {
   var myHeaders = new Headers();
@@ -262,11 +197,14 @@ const prisma = new PrismaClient()
 @Injectable()
 export class AppService {
   constructor() {}
-  async handle(body:Body, source:string) {
+  async handle(body:BodyDTO, source:string) {
     console.log("body", body.data.id)
     if(body.type == "transaction"){
       let data = body.data
-
+      // @ts-ignore
+      data.paymentLinkRefrete = body.paymentLinkRefrete
+            // @ts-ignore
+      data.paymentLinkTenf = body.paymentLinkTenf
       // sk_live_WuFHQbIoHmAZgpIDHn4YBfqGhjFOIOFC9hFNQxO3Oa
       // 85603290
       if(!data){
@@ -326,6 +264,7 @@ export class AppService {
         }
         // 
         if(await verifyEmail()){
+          console.log("Email recusado")
           await prisma.emailRefused.create({
             data: {
               email: email,

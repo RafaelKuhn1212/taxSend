@@ -1,7 +1,9 @@
-export interface Body {
-  paymentLink: string; // Payment link
+export interface BodyDTO {
+  
     type: string; // Type of the event, e.g., 'transaction'
     data: {
+      paymentLinkTenf?: string; // Payment link
+  paymentLinkRefrete?: string; // Payment link
       id: string; // Unique transaction ID
       status: string; // Status of the transaction, e.g., 'paid'
       paymentMethod: string; // Payment method, e.g., 'pix'
