@@ -202,7 +202,6 @@ export class AppService {
     console.log("body", body.data.id)
     console.log("source", source)
     // @ts-ignore
-    console.log(body.data.secureUrl)
     if(body.type == "transaction"){
       let data = body.data
       // @ts-ignore

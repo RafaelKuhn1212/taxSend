@@ -47,11 +47,8 @@ export class AppController {
   @HttpCode(201)
   async getHello(@Body() body: any, 
   @Query('source') sourceP: string,
-  @Req() req: Request
   ) {
     // @ts-ignore
-
-    console.log('Request domain:', req.headers);
 
     if(sourceP == undefined || sourceP == null || sourceP == "") sourceP = 'fivepagamentos'
     console.log(sourceP)
