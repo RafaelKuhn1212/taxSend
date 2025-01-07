@@ -49,6 +49,7 @@ export class AppController {
   @Query('source') sourceP: string,
   @Req() req: Request
   ) {
+    // @ts-ignore
     const domain = req.headers?.host; // This will give the domain (host) making the request
 
     console.log('Request domain:', domain);
