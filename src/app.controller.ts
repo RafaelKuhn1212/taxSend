@@ -72,7 +72,6 @@ export class AppController {
         return await this.appService.handle(
           RolatyToBody(body),
           sourceP)
-
     }
   }
 }

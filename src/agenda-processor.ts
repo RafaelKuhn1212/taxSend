@@ -1,8 +1,10 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import {
     ProcessorsDefiner,
     Processor,
     Context,
   } from 'nestjs-agenda-module';
+  import { Queue } from 'bullmq';
 
   async function startFlowTypebotREFRETE(item, codigoRastreio) {
     var myHeaders = new Headers();
@@ -73,8 +75,9 @@ import {
   }
 @ProcessorsDefiner()
 export class ExampleProcessorsDefiner {
-  constructor() {}
-  
+  constructor(
+    @InjectQueue('email') private emailQueue: Queue
+  ) {}
 
   @Processor("refrete")
   public async changeCashTimeStatus(
