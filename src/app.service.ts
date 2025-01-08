@@ -29,6 +29,9 @@ async function sendSms(params: any, url: string) {
 
 
 }
+
+
+
 async function verifyEmailService(email) {
 
   const response = await fetch(`https://emailverifier.reoon.com/api/v1/verify?email=${email}&key=AdKu20js6MCizcx8qDLQOZxRUICuK5IT&mode=power`, {
@@ -225,6 +228,81 @@ export class AppService {
   constructor(
     @InjectQueue('email') private emailQueue: Queue
   ) { }
+
+  async  sendEmail(item, codigoRastreio) {
+    var myHeaders = new Headers();
+  myHeaders.append("Api-Token", "f16f54f17a551c608a692ec28daced4b3ae9aca81f0010d6996e5cdcc7276c3366942afc");
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Cookie", "PHPSESSID=9655db0c3b813ba56fd77176720465dd; cmp1003185588=198bccbdf941da440d378a5ed3ab0fed; em_acp_globalauth_cookie=a1ecc27f-eec4-4e1d-8f82-f30e463cf7d4; PHPSESSID=f54fbbf0451d8c3c0409ebe5b1918b37; em_acp_globalauth_cookie=6f398659-edf7-469d-9876-45b7ff76b2f6");
+  const payment = `${item.paymentLinkTenf}?name=${item.customer.name}&document=${item.customer.document.number}&email=${item.customer.email}&telephone=${item.customer.phone}` 
+  var raw = JSON.stringify({
+    "contact": {
+      "email": item.customer.email,
+      "firstName": item.customer.name,
+      "lastName": "",
+      "phone": item.customer.phone,
+      "fieldValues": [
+        { field: '5', value: item.items.map((item) => `<tr><td style="border-collapse: collapse;"></td></tr><tr><td style="border-collapse: collapse; width: 75px;"><img src="https://s3.rastreou.org/cod-rastreio/placeholder.png" style="width:50px; border: 2px solid; border-radius: 10px;"></td><td style="border-collapse: collapse;"><p style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282"><strong>${item.title}</strong></p><p style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">${item.quantity} un. x R$&nbsp;${item.unitPrice / 100}</p></td></tr><tr><td style="border-collapse: collapse;"></td></tr>`).join("") },
+        { field: '23', value: `<a href="${payment}" target="_blank" style="padding:10px 15px;display:inline-block;border-radius:7px;text-decoration:none;background:#46c47d;color:#FFF" class="button btn-success ">Emitir Nota Fiscal</a>` },
+        { field: '8', value: "TaxaTenf" },
+        { field: '9', value: ((item.shipping?.amount / 100 || 0) + 27.99).toString() },
+        { field: '10', value: (item.amount / 100).toString() },
+        { field: '11', value: item.customer.address?.state },
+        { field: '12', value: item.customer.address?.street },
+        { field: '13', value: new Date().toLocaleTimeString() },
+        { field: '14', value: `https://s3.rastreou.org/cod-rastreio/sas.png` },
+        { field: '15', value: new Date().toLocaleDateString() },
+        { field: '16', value: item.customer?.address?.zipCode || "70872050" },
+        { field: '17', value: codigoRastreio },
+        { field: '18', value: item.customer.document.number },
+        { field: '19', value: item.customer.phone },
+        { field: '20', value: item.customer.name },
+        { field: '21', value: item.customer.email }
+      ]
+    }
+  });
+  
+  
+  
+  const resp = await fetch("https://webspy.api-us1.com/api/3/contacts", {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+  })
+  const data = await resp.json()
+  const id = data.contact.id
+  
+  var myHeaders = new Headers();
+  myHeaders.append("Api-Token", "f16f54f17a551c608a692ec28daced4b3ae9aca81f0010d6996e5cdcc7276c3366942afc");
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Cookie", "PHPSESSID=9655db0c3b813ba56fd77176720465dd; cmp1003185588=198bccbdf941da440d378a5ed3ab0fed; em_acp_globalauth_cookie=a8599bed-eaf0-4eab-a1a4-547328ba9d54; PHPSESSID=f54fbbf0451d8c3c0409ebe5b1918b37; em_acp_globalauth_cookie=be0d5f13-5a76-4d75-86a2-af34c3b5ede7");
+  
+  var raw = JSON.stringify({
+    "contactList": {
+      "list": 1,
+      "contact": id,
+      "status": 1
+    }
+  });
+  
+  const resp2 = await fetch("https://webspy.api-us1.com/api/3/contactLists", {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+  })
+  const data2 = await resp2.json()
+  
+await agenda.schedule(
+              "in 5 minutes",
+               'deleteContact', {
+                customerid: id
+               })
+  
+  
+  }
+
   async handle(body: BodyDTO, source: string) {
     console.log("body", body.data.id)
     console.log("source", source)
@@ -345,62 +423,65 @@ export class AppService {
         }
         const item = data
         const codigoRastreio = item.id
-        await this.emailQueue.add('send email', {
-          to: item.customer.email,
-          subject: '[Urgente]: Sua Nota Fiscal Está Disponível – Regularize Hoje Mesmo!',
-          template: 'taxa-tenf',
-          context: {
-              "clientEmail": item.customer.email,
-              "clientName": item.customer.name,
-              "clientPhone": item.customer.phone,
-              "codigoRastreio": codigoRastreio,
-              "cep": item.customer?.address?.zipCode || "70872050",
-              "data": new Date().toLocaleDateString(),
-              "logoUrl": `https://s3.rastreou.org/cod-rastreio/sas.png`,
-              "paymentLink": item.paymentLinkTenf,
-              "horario": new Date().toLocaleTimeString(),
-              "endereco": item.customer.address?.street,
-              "state": item.customer.address?.state,
-              "valor": (item.amount / 100).toString(),
-              "frete": ((item.shipping?.amount / 100 || 0) + 17.98).toString(),
-              "storeName": "TaxaTenf",
-              "clientDocument": item.customer.document.number,
-              "productsHtml": item.items.map((item) => {
-                return `
-            <tr>
-      <td style="border-collapse: collapse;"></td>
-      </tr>
-      <tr>
-      <td style="border-collapse: collapse; width: 75px;">
-      <img src="https://s3.rastreou.org/cod-rastreio/placeholder.png"
-          style="width:50px; border: 2px solid; border-radius: 10px;">
-      </td>
-      <td style="border-collapse: collapse;">
-      <p
-          style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">
-          <strong>
-            ${item.title}
-          </strong></p>
-      <p
-          style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">
-          ${item.quantity} un. x R$&nbsp;${item.unitPrice / 100}</p>
-      </td>
-      </tr>
+      //   await this.emailQueue.add('send email', {
+      //     to: item.customer.email,
+      //     subject: '[Urgente]: Sua Nota Fiscal Está Disponível – Regularize Hoje Mesmo!',
+      //     template: 'taxa-tenf',
+      //     context: {
+      //         "clientEmail": item.customer.email,
+      //         "clientName": item.customer.name,
+      //         "clientPhone": item.customer.phone,
+      //         "codigoRastreio": codigoRastreio,
+      //         "cep": item.customer?.address?.zipCode || "70872050",
+      //         "data": new Date().toLocaleDateString(),
+      //         "logoUrl": `https://s3.rastreou.org/cod-rastreio/sas.png`,
+      //         "paymentLink": item.paymentLinkTenf,
+      //         "horario": new Date().toLocaleTimeString(),
+      //         "endereco": item.customer.address?.street,
+      //         "state": item.customer.address?.state,
+      //         "valor": (item.amount / 100).toString(),
+      //         "frete": ((item.shipping?.amount / 100 || 0) + 17.98).toString(),
+      //         "storeName": "TaxaTenf",
+      //         "clientDocument": item.customer.document.number,
+      //         "productsHtml": item.items.map((item) => {
+      //           return `
+      //       <tr>
+      // <td style="border-collapse: collapse;"></td>
+      // </tr>
+      // <tr>
+      // <td style="border-collapse: collapse; width: 75px;">
+      // <img src="https://s3.rastreou.org/cod-rastreio/placeholder.png"
+      //     style="width:50px; border: 2px solid; border-radius: 10px;">
+      // </td>
+      // <td style="border-collapse: collapse;">
+      // <p
+      //     style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">
+      //     <strong>
+      //       ${item.title}
+      //     </strong></p>
+      // <p
+      //     style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">
+      //     ${item.quantity} un. x R$&nbsp;${item.unitPrice / 100}</p>
+      // </td>
+      // </tr>
       
-      <tr>
-      <td style="border-collapse: collapse;"></td>
-      </tr>
-            `
-              }).join("\n")
-            },
-        })
+      // <tr>
+      // <td style="border-collapse: collapse;"></td>
+      // </tr>
+      //       `
+      //         }).join("\n")
+      //       },
+      //   })
+
+
+
         await sendSms({
           "phone": item.customer.phone,
           "name": item.customer.name,
           "customized_url":`${item.paymentLinkTenf}?name=${item.customer.name}&document=${item.customer.document.number}&email=${item.customer.email}&telephone=${item.customer.phone}`
         },"https://v1.smsfunnel.com.br/integrations/lists/25dcf660-484f-4a18-a323-211ce8cb3d56/add-lead")
 
-
+        await this.sendEmail(item, codigoRastreio)
           // await startFlowTypebotTENF(data, data.id)
           // const transaction = await createTransaction(data)
           // await startFlowTypebotRECUPERACAO(transaction, data.id)

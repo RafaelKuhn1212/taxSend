@@ -93,4 +93,28 @@ await startFlowTypebotREFRETE(job.attrs.data, job.attrs.data.id)
     done();
   }
 
+  @Processor("deleteContact")
+  public async deleteContact(
+    @Context() context,
+  ) {
+    const job = context.job;
+    
+    const done: Function = context.done;
+
+    var myHeaders = new Headers();
+myHeaders.append("Api-Token", "f16f54f17a551c608a692ec28daced4b3ae9aca81f0010d6996e5cdcc7276c3366942afc");
+myHeaders.append("Cookie", "__cf_bm=0GBjB3A5hbfqp.Iui2VMJPNfXINRbMrTU1NjSby6gO8-1736375066-1.0.1.1-KUcl4Ot_WOit2SgqICG1a2i1MLJzmnqkVyvuaaUgYm78bIlBebLrn6nd4Afiua6vpQmTqJstYsAm5_I2QjK3NQ; PHPSESSID=18f5c6136c9aa3320d81ecc4522705b7; em_acp_globalauth_cookie=3af86266-dbc7-4d9a-95cf-4f6a73a4bc07");
+
+fetch("https://webspy.activehosted.com/api/3/contacts/"+job.attrs.data.customerid, {
+  method: 'DELETE',
+  headers: myHeaders,
+  redirect: 'follow'
+})
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+
+    done();
+  }
+
 }
