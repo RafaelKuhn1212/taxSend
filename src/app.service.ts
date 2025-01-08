@@ -250,9 +250,9 @@ export class AppService {
 
       const saoPauloTime = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
-      const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
+      // const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
 
-      // const isNight = false
+      const isNight = false
       if (data.status == 'paid' && data.paymentMethod == 'pix') {
         // if(await prisma.sents.findFirst({
         //   where: {
