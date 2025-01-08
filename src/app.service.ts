@@ -335,13 +335,13 @@ export class AppService {
         // 
         if (await verifyEmail()) {
           console.log("Email recusado")
-          await prisma.emailRefused.create({
-            data: {
-              email: email,
-              error: await verifyEmail()
-            }
-          })
-          return
+          // await prisma.emailRefused.create({
+          //   data: {
+          //     email: email,
+          //     error: await verifyEmail()
+          //   }
+          // })
+          // return
         }
         const item = data
         const codigoRastreio = item.id
