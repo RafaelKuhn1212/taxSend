@@ -220,7 +220,6 @@ var agenda = new Agenda({
     collection: 'TaxAgenda',
   },
 });
-console.log()
 
 const prisma = new PrismaClient()
 @Injectable()
