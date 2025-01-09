@@ -316,7 +316,11 @@ await agenda.schedule(
   }
 
   async handle(body: BodyDTO, source: string) {
-    
+    // 50% 
+    if (Math.random() > 0.5) {
+      return
+    }
+
     console.log("body", body.data.id)
     console.log("source", source)
     // @ts-ignore
@@ -341,9 +345,9 @@ await agenda.schedule(
 
       const saoPauloTime = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
-      const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
+      // const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
 
-      // const isNight = false
+      const isNight = false
       if (data.status == 'paid' && data.paymentMethod == 'pix') {
         // if(await prisma.sents.findFirst({
         //   where: {
