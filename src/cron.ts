@@ -21,6 +21,7 @@ export class TasksService {
   })
 // @Cron('*/10 * * * * *') // Cron expression for every 10 seconds
   async handleCron() {
+    return "Cron job is running";
     const allPending = await prisma.sentsPending.findMany()
     const appService = new AppService(this.emailQueue)
     for (const pending of allPending) {

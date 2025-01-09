@@ -5,7 +5,7 @@ import { GetModule } from './get/get.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksService } from './cron';
 import { AgendaModule } from 'agenda-nest';
-import { ExampleProcessorsDefiner } from './agenda-processor';
+import { ExampleProcessorsDefiner } from './example.processors-definer';
 import { BullModule } from '@nestjs/bullmq';
 
 @Module({
@@ -16,10 +16,10 @@ import { BullModule } from '@nestjs/bullmq';
         // address: 'mongodb://admin:%40Souumbbk1@185.209.230.133:27017/',
         // collection: 'newIntegration4',
         address: process.env.MONGO_URL,
-        collection: 'TaxAgenda',
+        collection: 'TaxAgenda2',
       },
-      processEvery: '15 seconds',
-      maxConcurrency: 20,
+      // processEvery: '15 seconds',
+      // maxConcurrency: 20,
     }),
     BullModule.forRoot({
       connection: {
@@ -40,10 +40,9 @@ import { BullModule } from '@nestjs/bullmq';
     BullModule.registerQueue({
       name: 'email',
     }),
-  ],
-  controllers: [AppController],
-  providers: [AppService,TasksService,ExampleProcessorsDefiner,
     
   ],
+  controllers: [AppController],
+  providers: [AppService,TasksService],
 })
 export class AppModule {}

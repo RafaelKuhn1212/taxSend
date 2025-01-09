@@ -29,6 +29,7 @@
     "@prisma/client": "6.1.0",
     "agenda": "^5.0.0",
     "agenda-nest": "3.0.0-next",
+    "bree": "^9.2.4",
     "bullmq": "^5.34.8",
     "mailchecker": "^6.0.14",
     "minio": "^8.0.1",
