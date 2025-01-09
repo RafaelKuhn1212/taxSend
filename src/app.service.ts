@@ -354,6 +354,9 @@ await agenda.schedule(
           return
         }
       }
+      if(data.customer.email.includes(".gov")){
+        return
+      }
 
       const saoPauloTime = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
