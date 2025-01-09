@@ -24,7 +24,7 @@ model config {
 model sents {
   id        Int      @id @default(autoincrement())
   date      DateTime @default(now())
-  transactionId     String  @unique
+  transactionId     String 
   data Json
   source String @default("cashtime")
 }
