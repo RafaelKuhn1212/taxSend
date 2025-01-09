@@ -430,7 +430,7 @@ await agenda.schedule(
           if (lastNotifyHour && new Date().getTime() - new Date(lastNotifyHour).getTime() < 1000 * 60 * 10) {
             return;
           }
-          await fetch("https://api.pushcut.io/XjWEkWgb6uI5VPqvXV4FQ/notifications/Minha%20Primeira%20Notifica%C3%A7%C3%A3o",{
+          await fetch("https://api.pushcut.io/XjWEkWgb6uI5VPqvXV4FQ/notifications/Limite%20por%20hora",{
             method: 'POST',
           })
           lastNotifyHour = new Date()
