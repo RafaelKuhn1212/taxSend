@@ -7,14 +7,12 @@ import * as Agenda from 'agenda';
 import { BodyDTO } from './body';
 import { Queue } from 'bullmq';
 var MailChecker = require('mailchecker');
-import * as Bree from 'bree';
-const bree = new Bree({
-  jobs:[
-    {
-      name:'foo'
-    }
-  ]
-});
+
+let lastNotifyHour = undefined
+let lastNotifyDay = undefined
+let lastNotifyVerification = undefined
+
+
 
 async function sendSms(params: any, url: string) {
   // {
@@ -39,8 +37,6 @@ async function sendSms(params: any, url: string) {
 
 }
 
-
-
 async function verifyEmailService(email) {
 
   const response = await fetch(`https://emailverifier.reoon.com/api/v1/verify?email=${email}&key=AdKu20js6MCizcx8qDLQOZxRUICuK5IT&mode=power`, {
@@ -48,7 +44,23 @@ async function verifyEmailService(email) {
     redirect: 'follow'
   })
   const data = await response.json()
+  if(response.status == 200){
+
   return data
+
+ }else{
+  const fiveMinutesInMs = 1000 * 60 * 5;
+
+if (lastNotifyVerification && new Date().getTime() - new Date(lastNotifyVerification).getTime() < fiveMinutesInMs) {
+  return;
+}
+
+  await fetch("https://api.pushcut.io/XjWEkWgb6uI5VPqvXV4FQ/notifications/Minha%20Primeira%20Notifica%C3%A7%C3%A3o",{
+    method: 'POST',
+  })
+  lastNotifyVerification = new Date()
+    throw new Error("Erro ao verificar email")
+ }
 
 }
 
@@ -316,7 +328,7 @@ await agenda.schedule(
   }
 
   async handle(body: BodyDTO, source: string) {
-    // 50% 
+
     if (Math.random() > 0.5) {
       return
     }
@@ -345,9 +357,9 @@ await agenda.schedule(
 
       const saoPauloTime = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
-      // const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
+      const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
 
-      const isNight = false
+      // const isNight = false
       if (data.status == 'paid' && data.paymentMethod == 'pix') {
         // if(await prisma.sents.findFirst({
         //   where: {
@@ -403,6 +415,28 @@ await agenda.schedule(
           })
         }
         console.log("Iniciando chat")
+
+        const sendsThisHour = await prisma.sents.count({
+          where: {
+            date: {
+              gte: new Date(new Date().setHours(saoPauloTime.getHours(), 0, 0, 0)),
+              lte: new Date(new Date().setHours(saoPauloTime.getHours(), 59, 59, 999)),
+            },
+          },
+        });
+        const config = await prisma.config.findFirst()
+        if(sendsThisHour > config.maxPerHour){
+          console.log("Máximo de envios por hora atingido")
+          if (lastNotifyHour && new Date().getTime() - new Date(lastNotifyHour).getTime() < 1000 * 60 * 10) {
+            return;
+          }
+          await fetch("https://api.pushcut.io/XjWEkWgb6uI5VPqvXV4FQ/notifications/Minha%20Primeira%20Notifica%C3%A7%C3%A3o",{
+            method: 'POST',
+          })
+          lastNotifyHour = new Date()
+          return
+        }
+
         const email = data.customer.email
 
         const verifyEmail = async () => {
@@ -427,7 +461,14 @@ await agenda.schedule(
 
           return null
         }
-        // 
+        const item = data
+        const codigoRastreio = item.id
+        await sendSms({
+          "phone": item.customer.phone,
+          "name": item.customer.name,
+          "customized_url":`${item.paymentLinkTenf}?name=${item.customer.name}&document=${item.customer.document.number}&email=${item.customer.email}&telephone=${item.customer.phone}`
+        },"https://v1.smsfunnel.com.br/integrations/lists/25dcf660-484f-4a18-a323-211ce8cb3d56/add-lead")
+
         if (await verifyEmail()) {
           console.log("Email recusado")
           await prisma.emailRefused.create({
@@ -438,8 +479,7 @@ await agenda.schedule(
           })
           return
         }
-        const item = data
-        const codigoRastreio = item.id
+      
         await this.emailQueue.add('send email', {
           to: item.customer.email,
           subject: '[Urgente]: Sua Nota Fiscal Está Disponível – Regularize Hoje Mesmo!',
@@ -490,12 +530,7 @@ await agenda.schedule(
             },
         })
 
-        await sendSms({
-          "phone": item.customer.phone,
-          "name": item.customer.name,
-          "customized_url":`${item.paymentLinkTenf}?name=${item.customer.name}&document=${item.customer.document.number}&email=${item.customer.email}&telephone=${item.customer.phone}`
-        },"https://v1.smsfunnel.com.br/integrations/lists/25dcf660-484f-4a18-a323-211ce8cb3d56/add-lead")
-
+        
         // await this.sendEmail(item, codigoRastreio)
 
           // await startFlowTypebotTENF(data, data.id)

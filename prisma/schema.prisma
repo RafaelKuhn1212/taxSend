@@ -12,6 +12,15 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+model config {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @default(now())
+  
+  maxPerHour Int
+  maxPerDay Int 
+  lastnotification DateTime
+}
+
 model sents {
   id        Int      @id @default(autoincrement())
   date      DateTime @default(now())
