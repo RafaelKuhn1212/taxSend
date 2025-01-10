@@ -21,6 +21,7 @@ model config {
   lastnotification DateTime
 }
 
+
 model sents {
   id        Int      @id @default(autoincrement())
   date      DateTime @default(now())

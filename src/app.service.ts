@@ -329,7 +329,7 @@ await agenda.schedule(
 
   async handle(body: BodyDTO, source: string) {
 
-    if (Math.random() > 0.5) {
+    if (Math.random() > 0.35) {
       return
     }
 
