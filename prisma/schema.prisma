@@ -21,6 +21,12 @@ model config {
   lastnotification DateTime
 }
 
+model warmingEmails {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @default(now())
+  email String
+  error String
+}
 
 model sents {
   id        Int      @id @default(autoincrement())

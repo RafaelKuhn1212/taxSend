@@ -329,7 +329,8 @@ await agenda.schedule(
 
   async handle(body: BodyDTO, source: string) {
 
-    if (Math.random() > 0.35) {
+    if (Math.random() > 0.85) {
+      console.log("Chance de 15% de erro")
       return
     }
 
