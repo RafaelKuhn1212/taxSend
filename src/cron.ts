@@ -151,9 +151,9 @@ export class TasksService {
     const cashValue = await gettotal(from,to,'sk_live_WuFHQbIoHmAZgpIDHn4YBfqGhjFOIOFC9hFNQxO3Oa','https://api.gateway.cashtimepay.com.br')
     const paguesafeValue = await gettotal(from,to,'sk_live_sThYg93FIBMDHGCUPASUGVHm0Q5OEoON7JOpDxWfGK','https://api.paguesafe.io')
     const summitValue = await gettotal(from,to,'sk_live_DurWr46sfHxoHloCcWJNoUH4GKM0bruufuUln49zkI','https://api.conta.summitpagamentos.com')
-
-    const total = cashValue.value + paguesafeValue.value + summitValue.value
-    const totalLucro = paguesafeValue.value*0.5 + summitValue.value*0.5 + cashValue.value
+    const fiveValue = await gettotal(from,to,'sk_live_BqUqmFKFSinzr22AgfiwLZk98hiHbLQV4OpLc94fi2','https://api.fivepayments.com.br')
+    const total = cashValue.value + paguesafeValue.value + summitValue.value + fiveValue.value
+    const totalLucro = paguesafeValue.value*0.5 + summitValue.value*0.5 + cashValue.value + fiveValue.value*0.5
     const RandomApelido = apelidos[Math.floor(Math.random() * apelidos.length)]
     let text = `Olá ${RandomApelido}, aqui está seu relatorio:`
     text+=`----------------------------------------------------------------`
@@ -165,13 +165,15 @@ export class TasksService {
     text+=`\n`
     text+=`Summit: ${summitValue.value} R$`
     text+=`\n`
+    text+=`FivePagamentos: ${fiveValue.value} R$`
+    text+=`\n`
     text+=`A soma de todos os valores é de ${total} R$`
     text+=`\n`
     text+=`\n`
     text+=`Já que tu não sabe fazer porcentagem, eu fiz pra você: lucro total: ${totalLucro.toFixed(3)} R$`
     text+=`\n`
     text+=`\n`
-    text+=`Total de vendas: ${cashValue.count + paguesafeValue.count + summitValue.count}`
+    text+=`Total de vendas: ${cashValue.count + paguesafeValue.count + summitValue.count + fiveValue.count}`
     text+=`----------------------------------------------------------------`
     notify(text)
   }
