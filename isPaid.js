@@ -6,7 +6,7 @@ function checkItem(data, title, status, email) {
     );
 }
 
-const response = await fetch('https://api.gateway.cashtimepay.com.br/v1/transactions/?email='+,{
+const response = await fetch('https://api.gateway.cashtimepay.com.br/v1/transactions/?email=',{
     headers: {
         "Authorization": "Basic c2tfbGl2ZV9XdUZIUWJJb0htQVpncElESG40WUJmcUdoakZPSU9GQzloRk5ReE8zT2E6eA==",
         "Content-Type": "application/json"

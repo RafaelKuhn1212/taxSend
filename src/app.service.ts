@@ -12,7 +12,28 @@ let lastNotifyHour = undefined
 let lastNotifyDay = undefined
 let lastNotifyVerification = undefined
 
+async function notify(text:string) {
+  
+  var myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+myHeaders.append("apikey", "gWlBmXNgZxaezDtx43S1MKZ6o5HDd^4#ZUNlT0gwQMuPqQN3JI");
 
+var raw = JSON.stringify({
+  "number": "558293505877",
+  "text": text
+});
+
+
+fetch("https://evolutionapi.ads-information.top/message/sendText/rastreou", {
+  method: 'POST',
+  headers: myHeaders,
+  body: raw,
+  redirect: 'follow'
+})
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+}
 
 async function sendSms(params: any, url: string) {
   // {
@@ -55,9 +76,7 @@ if (lastNotifyVerification && new Date().getTime() - new Date(lastNotifyVerifica
   return;
 }
 
-  await fetch("https://api.pushcut.io/XjWEkWgb6uI5VPqvXV4FQ/notifications/Minha%20Primeira%20Notifica%C3%A7%C3%A3o",{
-    method: 'POST',
-  })
+  notify("Acabou os creditos do serviço de validação, compra mais, monkey")
   lastNotifyVerification = new Date()
     throw new Error("Erro ao verificar email")
  }
@@ -134,7 +153,6 @@ async function startFlowTypebotTENF(item, codigoRastreio) {
   throw new Error("Erro ao iniciar chat")
 
 }
-
 
 async function startFlowTypebotRECUPERACAO(item, codigoRastreio) {
   var myHeaders = new Headers();
@@ -429,9 +447,7 @@ await agenda.schedule(
           if (lastNotifyHour && new Date().getTime() - new Date(lastNotifyHour).getTime() < 1000 * 60 * 10) {
             return;
           }
-          await fetch("https://api.pushcut.io/XjWEkWgb6uI5VPqvXV4FQ/notifications/Limite%20por%20hora",{
-            method: 'POST',
-          })
+          notify("Máximo de envios por hora atingido")
           lastNotifyHour = new Date()
           return
         }
