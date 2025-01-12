@@ -2,8 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import * as fs from "fs";
 const prisma = new PrismaClient();
 
-const secretKey = "sk_live_WuFHQbIoHmAZgpIDHn4YBfqGhjFOIOFC9hFNQxO3Oa";
-const url = "https://api.gateway.cashtimepay.com.br/v1";
+const secretKey = "sk_live_DurWr46sfHxoHloCcWJNoUH4GKM0bruufuUln49zkI";
+const url = "https://api.conta.summitpagamentos.com/v1";
 
 async function getAllCashtime() {
   const myHeaders = new Headers();
@@ -34,6 +34,9 @@ async function getAllCashtime() {
   }
 
   return allData;
+}
+async function getAllGateway() {
+
 }
 
 async function generateProductSummary() {
@@ -84,4 +87,72 @@ async function generateProductSummary() {
 }
 
 // Generate the summary
-generateProductSummary();
+// generateProductSummary();
+
+async function smtpSummary() {
+
+  const emails = JSON.parse(fs.readFileSync("/home/rafa/Documents/email_202501121817.json")).email;
+
+
+  const allSents = await prisma.sents.findMany({
+    where:{
+      source: "summit"
+    }
+  });
+
+  const allemailsSent = allSents.map((sent) => sent.data.customer.email);
+  
+
+  let sents = JSON.parse(fs.readFileSync("/home/rafa/Documents/sents_email_202501121752.json")).sents_email;
+  sents = sents.filter((sent) => allemailsSent.includes(sent.to));
+  const allPaid = await getAllCashtime();
+  const allEmails = new Set(allPaid.map((sell) => sell.customer.email));
+
+  // Map to track how many emails each user has sent and if they have paid
+  const emailMap = new Map();
+
+  // Process sent emails and check if they are in paid emails
+  sents.forEach((sent) => {
+    const user = sent.user; // Assuming 'sent.user' is the email address
+    if (!emailMap.has(user)) {
+      emailMap.set(user, { sent: 0, paid: 0 });
+    }
+
+    if (allEmails.has(sent.to)) {
+      emailMap.get(user).paid += 1;
+    } else {
+      emailMap.get(user).sent += 1;
+    }
+  });
+
+  // Convert the map to an array of objects with email, sent count, and paid count
+  let result = Array.from(emailMap.entries()).map(([email, { sent, paid }]) => ({
+    email,
+    sent,
+    paid,
+    percentPaid: sent + paid > 0 ? ((paid / (sent + paid)) * 100).toFixed(2) : 0
+  }));
+
+  // Order by sent count and then by paid count
+  result = result.sort((a, b) => b.sent - a.sent || b.paid - a.paid);
+  result.map((res) => {
+    sent.email = emails.find((email) => email.user === sent.email)?.host || 'brevo';
+  });
+  // Write the result to a JSON file
+  fs.writeFileSync("smtp_summary.json", JSON.stringify(result, null, 2));
+
+  console.log("SMTP summary generated successfully.");
+}
+
+// smtpSummary();
+
+async function findSmtpSummaryHost(){
+  const emails = JSON.parse(fs.readFileSync("/home/rafa/Documents/email_202501121817.json")).email;
+  const sents = JSON.parse(fs.readFileSync("smtp_summary.json"));
+  sents.map((sent) => {
+    sent.email = emails.find((email) => email.user === sent.email)?.host || 'brevo';
+  });
+  fs.writeFileSync("smtp_summary.json", JSON.stringify(sents, null, 2));
+
+}
+findSmtpSummaryHost();

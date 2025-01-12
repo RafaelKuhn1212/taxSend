@@ -81,6 +81,53 @@ export class AppController {
           sourceP)
     }
   }
+
+  @Post("abandoned")
+  @HttpCode(201)
+  async getAbandoned(@Body() body: any, 
+  @Query('source') sourceP: string,
+  ){
+    async function sendSms(params: any, url: string) {
+      // {
+      //   "name": "nando6",
+      //   "phone": "5551989026300",
+      //   "customized_url": "codigoDeRastreio"
+      // }
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+    
+      var raw = JSON.stringify(
+        params
+      );
+    
+      await fetch(url, {
+        method: 'POST',
+        body: raw,
+        redirect: 'follow',
+        headers: myHeaders
+      })
+    
+    
+    }
+    const {
+      phone,
+      name,
+      email,
+      document
+    } = body.customer
+    if(sourceP == undefined || sourceP == null || sourceP == "") sourceP = 'fivepagamentos'
+    if(!isSource(sourceP)) return "Invalid source"
+    const {
+      paymentLinkTenf
+    } = sources.find((source) => source.name == sourceP)
+   
+    await sendSms({
+      "phone": phone,
+      "name": name,
+      "customized_url":`${paymentLinkTenf}?name=${name}&document=${document}&email=${email}&telephone=${phone}`
+    },"https://v1.smsfunnel.com.br/integrations/lists/25dcf660-484f-4a18-a323-211ce8cb3d56/add-lead")
+
+  }
 }
 
 function RolatyToBody(body: any): BodyDTO {

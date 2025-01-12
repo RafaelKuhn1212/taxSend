@@ -167,7 +167,7 @@ export class TasksService {
     text+=`\n`
     text+=`FivePagamentos: ${fiveValue.value} R$`
     text+=`\n`
-    text+=`A soma de todos os valores é de ${total} R$`
+    text+=`A soma de todos os valores é de ${total.toFixed(3)} R$`
     text+=`\n`
     text+=`\n`
     text+=`Já que tu não sabe fazer porcentagem, eu fiz pra você: lucro total: ${totalLucro.toFixed(3)} R$`
