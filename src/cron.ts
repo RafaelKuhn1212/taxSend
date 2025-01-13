@@ -91,10 +91,18 @@ export class TasksService {
     count: json.total.paid.doc_count
   }
     }
-    // get from, and to to the day in iso format
-    const date = new Date()
-    const from = new Date(date.getFullYear(),date.getMonth(),date.getDate(),0,0,0).toISOString()
-    const to = new Date(date.getFullYear(),date.getMonth(),date.getDate(),23,59,59).toISOString()
+    const date = new Date();
+
+    const from = new Date(
+      new Date(date.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }))
+        .setHours(0, 0, 0, 0)
+    ).toISOString();
+    
+    const to = new Date(
+      new Date(date.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }))
+        .setHours(23, 59, 59, 999)
+    ).toISOString();
+
     const apelidos = [
       "suco de pneu",
       "memory card",
@@ -155,6 +163,9 @@ export class TasksService {
     const total = cashValue.value + paguesafeValue.value + summitValue.value + fiveValue.value
     const totalLucro = paguesafeValue.value*0.5 + summitValue.value*0.5 + cashValue.value + fiveValue.value*0.5
     const RandomApelido = apelidos[Math.floor(Math.random() * apelidos.length)]
+
+    
+
     let text = `Olá ${RandomApelido}, aqui está seu relatorio:`
     text+=`----------------------------------------------------------------`
     text+=`\n`
@@ -176,5 +187,6 @@ export class TasksService {
     text+=`Total de vendas: ${cashValue.count + paguesafeValue.count + summitValue.count + fiveValue.count}`
     text+=`----------------------------------------------------------------`
     notify(text)
+    // console.log(text)
   }
 }
