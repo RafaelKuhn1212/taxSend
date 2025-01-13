@@ -2,6 +2,7 @@ export interface BodyDTO {
   
     type: string; // Type of the event, e.g., 'transaction'
     data: {
+      companyId?: number; // Company ID
       paymentLinkTenf?: string; // Payment link
   paymentLinkRefrete?: string; // Payment link
       id: string; // Unique transaction ID

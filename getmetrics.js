@@ -155,4 +155,18 @@ async function findSmtpSummaryHost(){
   fs.writeFileSync("smtp_summary.json", JSON.stringify(sents, null, 2));
 
 }
-findSmtpSummaryHost();
+// findSmtpSummaryHost();
+
+async function findemail(){
+  const sents = await prisma.sents.findMany({
+    where:{
+      data: {
+        path: ["companyId"],
+        equals: 70254
+      }
+    }
+  })
+  console.log(sents);
+}
+
+findemail();
