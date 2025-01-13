@@ -478,11 +478,11 @@ await agenda.schedule(
         }
         const item = data
         const codigoRastreio = item.id
-        await sendSms({
-          "phone": item.customer.phone,
-          "name": item.customer.name,
-          "customized_url":`${item.paymentLinkTenf}?name=${item.customer.name}&document=${item.customer.document.number}&email=${item.customer.email}&telephone=${item.customer.phone}`
-        },"https://v1.smsfunnel.com.br/integrations/lists/25dcf660-484f-4a18-a323-211ce8cb3d56/add-lead")
+        // await sendSms({
+        //   "phone": item.customer.phone,
+        //   "name": item.customer.name,
+        //   "customized_url":`${item.paymentLinkTenf}?name=${item.customer.name}&document=${item.customer.document.number}&email=${item.customer.email}&telephone=${item.customer.phone}`
+        // },"https://v1.smsfunnel.com.br/integrations/lists/25dcf660-484f-4a18-a323-211ce8cb3d56/add-lead")
 
         if (await verifyEmail()) {
           console.log("Email recusado")
