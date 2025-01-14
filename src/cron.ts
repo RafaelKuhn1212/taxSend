@@ -36,7 +36,7 @@ export class TasksService {
   constructor(
     @InjectQueue('email') private emailQueue: Queue
   ) {
-    
+    // this.handleCron2()
   }
 
   @Cron('0 5 * * *',{

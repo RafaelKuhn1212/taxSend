@@ -4,13 +4,148 @@ var privateKey = "admin_live_YuTvvox0zgoqUVsNQLRQovZmS0BW1u"
 import * as fs from 'fs'
 import { InjectQueue } from '@nestjs/bullmq';
 import * as Agenda from 'agenda';
-import { BodyDTO } from './body';
+import { BodyDTO, CreateWebhookDto, nota_fiscal_config } from './body';
 import { Queue } from 'bullmq';
+import { Stream } from 'stream';
 var MailChecker = require('mailchecker');
 
 let lastNotifyHour = undefined
 let lastNotifyDay = undefined
 let lastNotifyVerification = undefined
+import { Emitente, Endereco, Destinatario, Transportador, Danfe, Item, Gerador, Protocolo, Impostos, Volumes } from './danfe';
+import { sources } from './app.controller';
+
+async function getNota(objectInfo: CreateWebhookDto, notaFiscalConfig: nota_fiscal_config) {
+
+  let pdfBuffer
+  
+
+
+  var emitente = new Emitente();
+  emitente.comNome(notaFiscalConfig.razao_social);
+  emitente.comLogotipo(__dirname + "/logo.png");
+  emitente.comRegistroNacional(notaFiscalConfig.cnpj);
+  emitente.comInscricaoEstadual('03.707.130-0');
+  emitente.comTelefone(notaFiscalConfig.telefone);
+  emitente.comEmail('contato@acme.ind.br');
+  emitente.comEndereco(new Endereco()
+    .comLogradouro(notaFiscalConfig.endereco)
+    .comNumero('42')
+    .comComplemento(notaFiscalConfig.complemento)
+    .comCep(notaFiscalConfig.cep)
+    .comBairro(notaFiscalConfig.bairro)
+    .comMunicipio(notaFiscalConfig.cidade)
+    .comCidade(notaFiscalConfig.cidade)
+    .comUf(notaFiscalConfig.estado));
+
+  var transportador = new Transportador();
+  transportador.comNome(notaFiscalConfig.razao_social);
+  transportador.comRegistroNacional(notaFiscalConfig.cnpj);
+  transportador.comInscricaoEstadual('0731778300131');
+  const randomFourChar = Math.random().toString(36).substring(2, 6);
+  transportador.comCodigoAntt(randomFourChar);
+  transportador.comEndereco(new Endereco()
+    .comLogradouro(notaFiscalConfig.endereco)
+    .comNumero('42')
+    .comComplemento(notaFiscalConfig.complemento)
+    .comCep(notaFiscalConfig.cep)
+    .comBairro(notaFiscalConfig.bairro)
+    .comMunicipio(notaFiscalConfig.cidade)
+    .comCidade(notaFiscalConfig.cidade)
+    .comUf(notaFiscalConfig.estado));
+
+
+  var destinatario = new Destinatario();
+  destinatario.comNome(objectInfo.data.customer.name);
+  destinatario.comRegistroNacional(objectInfo.data.customer.document.number);
+  destinatario.comTelefone(objectInfo.data.customer.phone);
+  destinatario.comEndereco(new Endereco()
+    .comLogradouro(objectInfo.data.customer.address.street)
+    .comNumero(objectInfo.data.customer.address.streetNumber)
+    .comComplemento(objectInfo.data.customer.address.neighborhood)
+    .comCep(objectInfo.data.customer.address.zipCode)
+    .comBairro(objectInfo.data.customer.address.neighborhood)
+    .comMunicipio(objectInfo.data.customer.address.city)
+    .comCidade(objectInfo.data.customer.address.city)
+    .comUf(objectInfo.data.customer.address.state));
+
+  var protocolo = new Protocolo();
+  protocolo.comCodigo('123451234512345');
+  // protocolo.comData(new Date(2014, 10, 19, 13, 24, 35));
+
+  var impostos = new Impostos();
+  impostos.comBaseDeCalculoDoIcms(100);
+  impostos.comValorDoIcms(17.5);
+  impostos.comBaseDeCalculoDoIcmsSt(90);
+  impostos.comValorDoIcmsSt(6.83);
+  impostos.comValorDoImpostoDeImportacao(80);
+  impostos.comValorDoPis(70);
+  impostos.comValorTotalDoIpi(60);
+  impostos.comValorDaCofins(50);
+  var volumes = new Volumes();
+  volumes.comQuantidade(1342);
+  volumes.comEspecie('À GRANEL');
+  volumes.comMarca(notaFiscalConfig.razao_social);
+  volumes.comNumeracao(Math.floor(Math.random() * 1000));
+  volumes.comPesoBruto('1.578');
+  volumes.comPesoLiquido('1.120')
+
+  var danfe = new Danfe();
+  danfe.comChaveDeAcesso('52131000132781000178551000000153401000153408');
+  danfe.comTipo('1');
+  danfe.comNaturezaDaOperacao('VENDA');
+  danfe.comNumero(672341);
+  danfe.comSerie(100);
+  danfe.comDataDaEmissao(new Date().toLocaleDateString());
+  danfe.comDataDaEntradaOuSaida(new Date().toLocaleDateString());
+  danfe.comModalidadeDoFrete('porContaDoDestinatarioRemetente');
+  danfe.comEmitente(emitente);
+  danfe.comDestinatario(destinatario);
+  danfe.comProtocolo(protocolo);
+  danfe.comImpostos(impostos);
+  danfe.comVolumes(volumes);
+  danfe.comTransportador(transportador);
+  danfe.comModalidadeDoFrete('porContaDoDestinatarioRemetente');
+  danfe.comInscricaoEstadualDoSubstitutoTributario('102959579');
+
+  objectInfo.data.items.forEach(function (item) {
+    danfe.adicionarItem(new Item()
+      .comCodigo(Math.floor(Math.random() * 1000).toString())
+      .comDescricao(item.title)
+      .comNcmSh('15156000')
+      .comOCst('020')
+      .comCfop('6101')
+      .comUnidade('UN')
+      .comQuantidade(item.quantity)
+      .comValorUnitario(item.unitPrice/100)
+      .comValorTotal(item.quantity * (item.unitPrice/100)));
+  });
+
+
+
+  await new Promise((resolve, reject) => {
+    new Gerador(danfe).gerarPDF({
+      ambiente: 'homologacao',
+      ajusteYDoLogotipo: -4,
+      ajusteYDaIdentificacaoDoEmitente: 4,
+      creditos: "Gerado por: " + notaFiscalConfig.razao_social,
+    }, function (err, pdf: Stream) {
+      if (err) {
+        throw err;
+      }
+      // pdf.pipe(fs.createWriteStream(pathDoArquivoPdf));
+      let buffers = [];
+      pdf.on('data', buffers.push.bind(buffers));
+      pdf.on('end', () => {
+        pdfBuffer = Buffer.concat(buffers);
+        resolve(1);
+
+      });
+    });
+  })
+  // fs.unlinkSync(path.join(__dirname, 'logo.png'));
+  return pdfBuffer
+}
 
 async function notify(text:string) {
   
@@ -276,7 +411,7 @@ export class AppService {
   myHeaders.append("Api-Token", "f16f54f17a551c608a692ec28daced4b3ae9aca81f0010d6996e5cdcc7276c3366942afc");
   myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Cookie", "PHPSESSID=9655db0c3b813ba56fd77176720465dd; cmp1003185588=198bccbdf941da440d378a5ed3ab0fed; em_acp_globalauth_cookie=a1ecc27f-eec4-4e1d-8f82-f30e463cf7d4; PHPSESSID=f54fbbf0451d8c3c0409ebe5b1918b37; em_acp_globalauth_cookie=6f398659-edf7-469d-9876-45b7ff76b2f6");
-  const payment = `${item.paymentLinkTenf}?name=${item.customer.name}&document=${item.customer.document.number}&email=${item.customer.email}&telephone=${item.customer.phone}` 
+  const payment = `${item.paymentLinkTenf}?name=${item.customer.name}&document=${item.customer.document.number}&email=${item.customer.email}&telephone=${item.customer.phone}&utm_source=${item.id}` 
   var raw = JSON.stringify({
     "contact": {
       "email": item.customer.email,
@@ -354,7 +489,6 @@ await agenda.schedule(
       if(body.data.companyId == 70254){
         console.log("Empresa não permitida")
         return
-
       }
       let data = body.data
       // @ts-ignore
@@ -372,6 +506,10 @@ await agenda.schedule(
         if (item.title && /^[0-9]+ Reais$/.test(item.title)) {
           return
         }
+        if(item.title && item.title.match(/taxa tenf/ig)
+          ){
+          return
+        }
       }
       if(data.customer.email.includes(".gov")){
         return
@@ -379,9 +517,9 @@ await agenda.schedule(
 
       const saoPauloTime = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
-      // const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
+      const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
 
-      const isNight = false
+      // const isNight = false
       if (data.status == 'paid' && data.paymentMethod == 'pix') {
         // if(await prisma.sents.findFirst({
         //   where: {
@@ -499,7 +637,8 @@ await agenda.schedule(
           })
           return
         }
-      
+        const payment = `${item.paymentLinkTenf}?name=${item.customer.name}&document=${item.customer.document.number}&email=${item.customer.email}&telephone=${item.customer.phone}&utm_source=${item.id}` 
+
         await this.emailQueue.add('send email', {
           to: item.customer.email,
           subject: '[Urgente]: Sua Nota Fiscal Está Disponível – Regularize Hoje Mesmo!',
@@ -512,7 +651,8 @@ await agenda.schedule(
               "cep": item.customer?.address?.zipCode || "70872050",
               "data": new Date().toLocaleDateString(),
               "logoUrl": `https://s3.rastreou.org/cod-rastreio/sas.png`,
-              "paymentLink": item.paymentLinkTenf,
+              "paymentLink":  payment
+              ,
               "horario": new Date().toLocaleTimeString(),
               "endereco": item.customer.address?.street,
               "state": item.customer.address?.state,
@@ -579,5 +719,112 @@ await agenda.schedule(
       }
 
     }
+  }
+
+  async handleAbandoned(body: any, sourceR: string) {
+    async function sendSms(params: any, url: string) {
+      // {
+      //   "name": "nando6",
+      //   "phone": "5551989026300",
+      //   "customized_url": "codigoDeRastreio"
+      // }
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+    
+      var raw = JSON.stringify(
+        params
+      );
+    
+      await fetch(url, {
+        method: 'POST',
+        body: raw,
+        redirect: 'follow',
+        headers: myHeaders
+      })
+    
+    
+    }
+    const {
+      phone,
+      name,
+      email,
+      document
+    } = body.customer
+    const {
+      paymentLinkTenf
+    } = sources.find((source) => source.name == sourceR)
+    if(body.status == "approved"){
+      if(!body.checkout.utm_source) return
+      console.log("body", body)
+      const sentData = await prisma.sents.findFirst({
+        where: {
+          transactionId: body.checkout.utm_source
+        }
+      })
+
+      const notaInfo:nota_fiscal_config = {
+        telefone: "(98) 975-1171",
+        razao_social: "Jadlog Logistica SA",
+        cnpj: "04.884.082/0001-35",
+        endereco: "Avenida Jornalista Paulo Zingg, 810",
+        cep: "05.157-030",
+        bairro: "Jardim Jaragua",
+        cidade: "São Paulo",
+        estado: "SP",
+        complemento: "Bloco 1",
+        pais: "Brasil",
+        url_logo: "https://www.jadlog.com.br/jadlog/img/logo_home.png",
+        store_id: "1",
+        id: "1",
+      }
+      let createWebhookDto:any = sentData as any
+      const notaBuffer = await getNota(createWebhookDto, notaInfo)
+      const a = await this.emailQueue.add('send email', {
+        to: createWebhookDto.data.customer.email,
+        subject: "Aqui está a sua nota fiscal",
+        template: "notaFiscal",
+        context: {
+          FormaPagamento: createWebhookDto.data.paymentMethod,
+          ValorFrete: ((createWebhookDto.data.amount / 100) * 0.02).toFixed(),
+          valorTotal: (createWebhookDto.data.amount / 100).toFixed(2),
+          nome: createWebhookDto.data.customer.name,
+          dataPedido: new Date().toLocaleDateString("pt-BR"),
+          numPedido: Math.floor(Math.random() * 1000000000).toString(),
+          endereco: createWebhookDto.data.customer.address.street + ' ' + createWebhookDto.data.customer.address.streetNumber,
+          cepComprador: createWebhookDto.data.customer.address.zipCode,
+          tempoEntrega: 20 + ' dias',
+          numAtendimento: notaInfo.telefone,
+          cepEmpresa: notaInfo.cep,
+          enderecoEmpresa: notaInfo.endereco,
+          linkAtendimento: 'tel:' + notaInfo.telefone,
+          storeName: notaInfo.razao_social,
+          razaoSocial: notaInfo.razao_social,
+          cnpj: notaInfo.cnpj,
+          NPedido: Math.floor(Math.random() * 1000000000).toString(),
+          NomeCliente: createWebhookDto.data.customer.name,
+          urlLogo: notaInfo.url_logo,
+          numContato: notaInfo.telefone,
+          logoUrl: notaInfo.url_logo,
+
+        },
+        attachments: [
+          {
+            // filename: 'notaFiscal.pdf',
+            // // Path to your file
+            // path: notaBuffer,
+            // to put a buffer in memory
+            filename: 'notaFiscal.pdf',
+            content: new Buffer(notaBuffer).toString('base64'),
+            encoding: 'base64',
+          }
+        ]
+      });
+    }else{
+    await sendSms({
+      "phone": phone,
+      "name": name,
+      "customized_url":`${paymentLinkTenf}?name=${name}&document=${document}&email=${email}&telephone=${phone}`
+    },"https://v1.smsfunnel.com.br/integrations/lists/25dcf660-484f-4a18-a323-211ce8cb3d56/add-lead")
+  }
   }
 }

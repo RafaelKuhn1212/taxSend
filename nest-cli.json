@@ -3,6 +3,9 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "assets": [
+      { "include": "src/danfe/**", "outDir": "dist/danfe", "watchAssets": true }
+    ],
+    "deleteOutDir": false
   }
 }

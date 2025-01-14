@@ -91,7 +91,7 @@ async function generateProductSummary() {
 
 async function smtpSummary() {
 
-  const emails = JSON.parse(fs.readFileSync("/home/rafa/Documents/email_202501121817.json")).email;
+  const emails = JSON.parse(fs.readFileSync("/home/rafa/Documents/email_202501140101.json")).email;
 
 
   const allSents = await prisma.sents.findMany({
@@ -103,7 +103,7 @@ async function smtpSummary() {
   const allemailsSent = allSents.map((sent) => sent.data.customer.email);
   
 
-  let sents = JSON.parse(fs.readFileSync("/home/rafa/Documents/sents_email_202501121752.json")).sents_email;
+  let sents = JSON.parse(fs.readFileSync("/home/rafa/Documents/sents_email_202501140104.json")).sents_email;
   sents = sents.filter((sent) => allemailsSent.includes(sent.to));
   const allPaid = await getAllCashtime();
   const allEmails = new Set(allPaid.map((sell) => sell.customer.email));
@@ -136,7 +136,7 @@ async function smtpSummary() {
   // Order by sent count and then by paid count
   result = result.sort((a, b) => b.sent - a.sent || b.paid - a.paid);
   result.map((res) => {
-    sent.email = emails.find((email) => email.user === sent.email)?.host || 'brevo';
+    res.email = emails.find((email) => email.user === res.email)?.host || 'brevo';
   });
   // Write the result to a JSON file
   fs.writeFileSync("smtp_summary.json", JSON.stringify(result, null, 2));
@@ -144,7 +144,7 @@ async function smtpSummary() {
   console.log("SMTP summary generated successfully.");
 }
 
-// smtpSummary();
+smtpSummary();
 
 async function findSmtpSummaryHost(){
   const emails = JSON.parse(fs.readFileSync("/home/rafa/Documents/email_202501121817.json")).email;
@@ -169,4 +169,4 @@ async function findemail(){
   console.log(sents);
 }
 
-findemail();
+// findemail();
