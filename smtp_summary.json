@@ -1,0 +1,44 @@
+[
+  {
+    "email": "email-smtp.sa-east-1.amazonaws.com",
+    "sent": 3926,
+    "paid": 512,
+    "percentPaid": "11.54"
+  },
+  {
+    "email": "send.smtp.com",
+    "sent": 778,
+    "paid": 87,
+    "percentPaid": "10.06"
+  },
+  {
+    "email": "smtp.maileroo.com",
+    "sent": 685,
+    "paid": 92,
+    "percentPaid": "11.84"
+  },
+  {
+    "email": "smtp.elasticemail.com",
+    "sent": 420,
+    "paid": 27,
+    "percentPaid": "6.04"
+  },
+  {
+    "email": "smtp.mailpace.com",
+    "sent": 145,
+    "paid": 19,
+    "percentPaid": "11.59"
+  },
+  {
+    "email": "brevo",
+    "sent": 79,
+    "paid": 4,
+    "percentPaid": "4.82"
+  },
+  {
+    "email": "pro.turbo-smtp.com",
+    "sent": 42,
+    "paid": 2,
+    "percentPaid": "4.55"
+  }
+]
