@@ -12,11 +12,16 @@ const keys =  [
     "name": "cashtime",
     "key": "sk_live_WuFHQbIoHmAZgpIDHn4YBfqGhjFOIOFC9hFNQxO3Oa",
     "url": "https://api.gateway.cashtimepay.com.br/v1"
+  },
+  {
+    "name": "fivepagamentos",
+    "key": "sk_live_BqUqmFKFSinzr22AgfiwLZk98hiHbLQV4OpLc94fi2",
+    "url": "https://api.fivepayments.com.br/v1"
   }
 ]
-
-const secretKey = "sk_live_WuFHQbIoHmAZgpIDHn4YBfqGhjFOIOFC9hFNQxO3Oa";
-const url = "https://api.gateway.cashtimepay.com.br/v1";
+const gatName = "fivepagamentos";
+const secretKey = keys.find((key) => key.name === gatName).key;
+const url =  keys.find((key) => key.name === gatName).url;
 
 async function getAllCashtime() {
   const myHeaders = new Headers();
@@ -193,11 +198,12 @@ async function findFive(){
   const paids = await getAllCashtime();
   const paidEmails = paids.map((paid) => paid.customer.email);
   const uniquePaidEmails = new Set(paidEmails);
+  console.log(uniquePaidEmails.size);
 
   const sentsPaid = sents.filter((sent) => uniquePaidEmails.has(sent.data.customer.email));
   const noRepeatSents = sentsPaid.map((sent) => sent.data.customer.email);
   const uniqueSents = new Set(noRepeatSents);
-
+  console.log(uniqueSents.size);
   fs.writeFileSync("five_emails.json", JSON.stringify(sentsPaid, null, 2));
 }
-// findFive()
+findFive()

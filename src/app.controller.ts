@@ -42,6 +42,11 @@ export const sources = [
     "name": "elitePay",
     "paymentLinkTenf": "https://pay.brasil-pagamentos.site/lDW0ZaKWbo9gN7E",
     "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
+  },
+  {
+    "name" : "soutpay",
+    "paymentLinkTenf": "https://pay.br-pagamento.site/lDW0ZaKW9YVgN7E",
+    "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
   }
 ]
 const isSource = (source) => {
@@ -79,6 +84,8 @@ export class AppController {
       case "paguesafe":
         return await this.appService.handle(body,sourceP)
       case "zyon":
+        return await this.appService.handle(body,sourceP)
+      case "soutpay":
         return await this.appService.handle(body,sourceP)
       case "royalfy":
         return await this.appService.handle(

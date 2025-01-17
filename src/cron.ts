@@ -36,7 +36,7 @@ export class TasksService {
   constructor(
     @InjectQueue('email') private emailQueue: Queue
   ) {
-    //  this.handleCron2()
+     this.handleCron2()
   }
 
   @Cron('0 5 * * *',{
@@ -165,29 +165,55 @@ export class TasksService {
     const totalLucro = paguesafeValue.value*0.5 + summitValue.value*0.5 + cashValue.value + fiveValue.value*0.5
     const RandomApelido = apelidos[Math.floor(Math.random() * apelidos.length)]
 
-    
+      const cashEnvios = await prisma.sents.count({
+        where:{
+          source: 'cashtime',
+          date:{
+            gte: new Date(from),
+            lte: new Date(to)
+          }
+        }
+      })
+      const paguesafeEnvios = await prisma.sents.count({
+        where:{
+          source: 'paguesafe',
+          date:{
+            gte: new Date(from),
+            lte: new Date(to)
+          }
+        }
+      })
+      const summitEnvios = await prisma.sents.count({
+        where:{
+          source: 'summit',
+          date:{
+            gte: new Date(from),
+            lte: new Date(to)
+          }
+        }
+      })
 
     let text = `Olá ${RandomApelido}, aqui está seu relatorio:`
     text+=`----------------------------------------------------------------`
     text+=`\n`
     text+=`\n`
-    text+=`Cashtime: ${cashValue.value} R$`
+    text+=`Cashtime: ${cashValue.value} R$ - ${cashValue.count} vendas de ${cashEnvios} envios (${(cashValue.count/cashEnvios*100).toFixed(2)}%)` 
     text+=`\n`
-    text+=`Paguesafe: ${paguesafeValue.value} R$`
+    text+=`Paguesafe: ${paguesafeValue.value} R$ - ${paguesafeValue.count} vendas de ${paguesafeEnvios} envios (${(paguesafeValue.count/paguesafeEnvios*100).toFixed(2)}%)`
     text+=`\n`
-    text+=`Summit: ${summitValue.value} R$`
+    text+=`Summit: ${summitValue.value} R$ - ${summitValue.count} vendas de ${summitEnvios} envios (${(summitValue.count/summitEnvios*100).toFixed(2)}%)`
     text+=`\n`
-    text+=`FivePagamentos: ${fiveValue.value} R$`
-    text+=`\n`
+    // text+=`FivePagamentos: ${fiveValue.value} R$`
+    // text+=`\n`
     text+=`A soma de todos os valores é de ${total.toFixed(3)} R$`
     text+=`\n`
     text+=`\n`
     text+=`Já que tu não sabe fazer porcentagem, eu fiz pra você: lucro total: ${totalLucro.toFixed(3)} R$`
     text+=`\n`
     text+=`\n`
-    text+=`Total de vendas: ${cashValue.count + paguesafeValue.count + summitValue.count + fiveValue.count}`
+    text+=`Total de vendas: ${cashValue.count + paguesafeValue.count + summitValue.count}`
     text+=`----------------------------------------------------------------`
   notify(text)
-    //console.log(text)
+    // console.log(text)
   }
 }
