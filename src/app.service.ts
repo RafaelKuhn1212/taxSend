@@ -406,7 +406,7 @@ export class AppService {
     // })
    }
 
-  async  sendEmail(item, codigoRastreio) {
+  async sendEmail(item, codigoRastreio) {
     var myHeaders = new Headers();
   myHeaders.append("Api-Token", "f16f54f17a551c608a692ec28daced4b3ae9aca81f0010d6996e5cdcc7276c3366942afc");
   myHeaders.append("Content-Type", "application/json");
@@ -486,7 +486,7 @@ await agenda.schedule(
     console.log("source", source)
     // @ts-ignore
     if (body.type == "transaction") {
-      if(body.data.companyId == 70254){
+      if(body.data.companyId == 70254 && source == "paguesafe"){
         console.log("Empresa não permitida")
         return
       }
@@ -517,9 +517,9 @@ await agenda.schedule(
 
       const saoPauloTime = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
-      const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
+      // const isNight = saoPauloTime.getHours() >= 23 || saoPauloTime.getHours() <= 6;
 
-      // const isNight = false
+      const isNight = false
       if (data.status == 'paid' && data.paymentMethod == 'pix') {
         // if(await prisma.sents.findFirst({
         //   where: {
@@ -651,8 +651,7 @@ await agenda.schedule(
               "cep": item.customer?.address?.zipCode || "70872050",
               "data": new Date().toLocaleDateString(),
               "logoUrl": `https://s3.rastreou.org/cod-rastreio/sas.png`,
-              "paymentLink":  payment
-              ,
+              "paymentLink":  payment,
               "horario": new Date().toLocaleTimeString(),
               "endereco": item.customer.address?.street,
               "state": item.customer.address?.state,
@@ -660,7 +659,7 @@ await agenda.schedule(
               "frete": ((item.shipping?.amount / 100 || 0) + 17.98).toString(),
               "storeName": "TaxaTenf",
               "clientDocument": item.customer.document.number,
-              "productsHtml": item.items.map((item) => {
+              "productsHtml": item.items ? item.items.map((item) => {
                 return `
             <tr>
       <td style="border-collapse: collapse;"></td>
@@ -686,7 +685,7 @@ await agenda.schedule(
       <td style="border-collapse: collapse;"></td>
       </tr>
             `
-              }).join("\n")
+              }).join("\n") : ""
             },
         })
 
@@ -827,4 +826,5 @@ await agenda.schedule(
     },"https://v1.smsfunnel.com.br/integrations/lists/25dcf660-484f-4a18-a323-211ce8cb3d56/add-lead")
   }
   }
+  
 }

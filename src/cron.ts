@@ -36,7 +36,7 @@ export class TasksService {
   constructor(
     @InjectQueue('email') private emailQueue: Queue
   ) {
-    // this.handleCron2()
+    //  this.handleCron2()
   }
 
   @Cron('0 5 * * *',{
@@ -187,7 +187,7 @@ export class TasksService {
     text+=`\n`
     text+=`Total de vendas: ${cashValue.count + paguesafeValue.count + summitValue.count + fiveValue.count}`
     text+=`----------------------------------------------------------------`
-    notify(text)
-    // console.log(text)
+  notify(text)
+    //console.log(text)
   }
 }

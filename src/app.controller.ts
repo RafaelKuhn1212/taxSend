@@ -4,7 +4,7 @@ import * as mongodb from 'mongodb'
 import * as Minio from 'minio'
 import { PrismaClient } from '@prisma/client';
 import { Five } from './royalty';
-import { BodyDTO, nota_fiscal_config } from './body';
+import { BodyDTO, SplitWave, nota_fiscal_config } from './body';
 
 const prisma = new PrismaClient()
 export const sources = [
@@ -36,6 +36,11 @@ export const sources = [
   {
     "name": "zyon",
     "paymentLinkTenf": "https://pay.br-oficial.site/PVYB34kRw81gKzk",
+    "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
+  },
+  {
+    "name": "elitePay",
+    "paymentLinkTenf": "https://pay.brasil-pagamentos.site/lDW0ZaKWbo9gN7E",
     "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
   }
 ]
@@ -133,3 +138,29 @@ function RolatyToBody(body: any): BodyDTO {
     }
   };
 }
+
+function splitToBody(body: SplitWave): BodyDTO {
+  return {
+    type: "transaction", // The type is always "transaction" as per the example
+    data: {
+      id: body.orderId, // Map the unique transaction ID correctly
+      status: body.status, // Map the status directly
+      paymentMethod: body.paymentMethod, // Payment method, like 'pix', 'boleto', etc.
+      customer: {
+        email: body.customer.email,
+        name: body.customer.name || undefined, // Customer's name (optional)
+        phone: body.customer.phone || undefined, // Customer's phone (optional)
+        address: undefined,
+        document: {
+          number: body.customer.document.number, // Document number
+        },
+      },
+      items: undefined,
+      amount: body.amount * 100, // Total transaction amount in cents
+      shipping: {
+        amount: 0, // Optional shipping amount, default to 0
+      },
+    },
+  };
+}
+

@@ -2,8 +2,21 @@ import { PrismaClient } from "@prisma/client";
 import * as fs from "fs";
 const prisma = new PrismaClient();
 
-const secretKey = "sk_live_DurWr46sfHxoHloCcWJNoUH4GKM0bruufuUln49zkI";
-const url = "https://api.conta.summitpagamentos.com/v1";
+const keys =  [
+  {
+    "name": "summit",
+    "key": "sk_live_DurWr46sfHxoHloCcWJNoUH4GKM0bruufuUln49zkI",
+    "url": "https://api.conta.summitpagamentos.com/v1"
+  },
+  {
+    "name": "cashtime",
+    "key": "sk_live_WuFHQbIoHmAZgpIDHn4YBfqGhjFOIOFC9hFNQxO3Oa",
+    "url": "https://api.gateway.cashtimepay.com.br/v1"
+  }
+]
+
+const secretKey = "sk_live_WuFHQbIoHmAZgpIDHn4YBfqGhjFOIOFC9hFNQxO3Oa";
+const url = "https://api.gateway.cashtimepay.com.br/v1";
 
 async function getAllCashtime() {
   const myHeaders = new Headers();
@@ -16,8 +29,10 @@ async function getAllCashtime() {
     redirect: 'follow'
   });
   const data2 = await resp2.text();
+  
   const pages = Math.ceil(parseInt(data2) / 1000);
   let allData = [];
+  
 
   for (let i = 0; i < pages; i++) {
     const offset = i * 1000;
@@ -35,15 +50,13 @@ async function getAllCashtime() {
 
   return allData;
 }
-async function getAllGateway() {
 
-}
 
 async function generateProductSummary() {
   // Fetch sent transactions
   const sentEmails = await prisma.sents.findMany({
     where: {
-      source: "cashtime"
+      source: "paguesafe"
     }
   });
   const sentProducts = sentEmails.flatMap((sent) => sent.data.items);
@@ -96,14 +109,14 @@ async function smtpSummary() {
 
   const allSents = await prisma.sents.findMany({
     where:{
-      source: "summit"
+      source: "cashtime"
     }
   });
 
   const allemailsSent = allSents.map((sent) => sent.data.customer.email);
   
 
-  let sents = JSON.parse(fs.readFileSync("/home/rafa/Documents/sents_email_202501140104.json")).sents_email;
+  let sents = JSON.parse(fs.readFileSync("/home/rafa/Documents/sents_email_202501152220.json")).sents_email;
   sents = sents.filter((sent) => allemailsSent.includes(sent.to));
   const allPaid = await getAllCashtime();
   const allEmails = new Set(allPaid.map((sell) => sell.customer.email));
@@ -170,3 +183,21 @@ async function findemail(){
 }
 
 // findemail();
+
+async function findFive(){
+  const sents = await prisma.sents.findMany({
+    where:{
+      source: "zyon"
+    }
+  });
+  const paids = await getAllCashtime();
+  const paidEmails = paids.map((paid) => paid.customer.email);
+  const uniquePaidEmails = new Set(paidEmails);
+
+  const sentsPaid = sents.filter((sent) => uniquePaidEmails.has(sent.data.customer.email));
+  const noRepeatSents = sentsPaid.map((sent) => sent.data.customer.email);
+  const uniqueSents = new Set(noRepeatSents);
+
+  fs.writeFileSync("five_emails.json", JSON.stringify(sentsPaid, null, 2));
+}
+// findFive()

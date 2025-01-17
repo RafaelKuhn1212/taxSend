@@ -125,3 +125,48 @@ export interface nota_fiscal_config  {
   pais: string;
   store_id: string;
 }
+
+export interface SplitWave {
+  orderId:                string;
+  amount:                 number;
+  formattedAmount:        string;
+  status:                 string;
+  isInfoProducts:         boolean;
+  postbackUrl:            string;
+  flag:                   null;
+  acquirer:               string;
+  paymentMethod:          string;
+  formattedPaymentMethod: string;
+  discount:               number;
+  customer:               Customer;
+  items:                  Item[];
+  pix:                    Pix;
+}
+
+export interface Customer {
+  ip:       string;
+  name:     string;
+  email:    string;
+  phone:    string;
+  document: Document;
+}
+
+export interface Document {
+  number: string;
+  type:   string;
+}
+
+export interface Item {
+  id:               string;
+  price:            number;
+  promotionalPrice: null;
+  tangible:         boolean;
+  type:             string;
+  quantity:         number;
+  originalItemId:   string;
+}
+
+export interface Pix {
+  payload:      string;
+  encodedImage: string;
+}
