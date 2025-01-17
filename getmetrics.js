@@ -162,7 +162,7 @@ async function smtpSummary() {
   console.log("SMTP summary generated successfully.");
 }
 
-smtpSummary();
+// smtpSummary();
 
 async function findSmtpSummaryHost(){
   const emails = JSON.parse(fs.readFileSync("/home/rafa/Documents/email_202501121817.json")).email;
@@ -206,4 +206,16 @@ async function findFive(){
   console.log(uniqueSents.size);
   fs.writeFileSync("five_emails.json", JSON.stringify(sentsPaid, null, 2));
 }
-findFive()
+// findFive()
+
+async function allSource(){
+  const allSource = await prisma.sents.groupBy({
+    by: ['source'],
+    _count: {
+      source: true
+    }
+  })
+  console.log(allSource);
+}
+
+allSource();
