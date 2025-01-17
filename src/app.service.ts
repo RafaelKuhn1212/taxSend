@@ -492,16 +492,18 @@ await agenda.schedule(
       }
       let data = body.data
       // @ts-ignore
-      data.paymentLinkRefrete = body.paymentLinkRefrete
+      data.paymentLinkRefrete = body.paymentLinkRefrete ? body.paymentLinkRefrete : data.paymentLinkRefrete
       // @ts-ignore
-      data.paymentLinkTenf = body.paymentLinkTenf
+      data.paymentLinkTenf = body.paymentLinkTenf ? body.paymentLinkTenf : data.paymentLinkTenf
       // sk_live_WuFHQbIoHmAZgpIDHn4YBfqGhjFOIOFC9hFNQxO3Oa
       // 85603290
       if (!data) {
         console.log("Erro ao buscar transação")
         return
       }
-      let isPhysical = data.items.some((item) => item.tangible)
+      let isPhysical = data.items ?
+      data.items.some((item) => item.tangible)  : false
+      if(data.items){
       for (let item of data.items) {
         if (item.title && /^[0-9]+ Reais$/.test(item.title)) {
           return
@@ -511,6 +513,7 @@ await agenda.schedule(
           return
         }
       }
+    }
       if(data.customer.email.includes(".gov")){
         return
       }
@@ -529,7 +532,7 @@ await agenda.schedule(
         //       console.log("Email já enviado hoje")
         //       return
         //     }
-
+        if(data.items){
         const productsNames = data.items.map((item) => item.title);
 
         // Query to check if the email was sent today with the same products
@@ -565,6 +568,7 @@ await agenda.schedule(
           console.log("Email já enviado hoje com os mesmos produtos");
           return "Email já enviado hoje com os mesmos produtos";
         }
+      }
         if (isNight) {
           console.log("Is night")
           return await prisma.sentsPending.create({
@@ -574,6 +578,7 @@ await agenda.schedule(
             }
           })
         }
+
         console.log("Iniciando chat")
 
         const sendsThisHour = await prisma.sents.count({
@@ -594,7 +599,6 @@ await agenda.schedule(
           lastNotifyHour = new Date()
           return
         }
-
         const email = data.customer.email
 
         const verifyEmail = async () => {
@@ -620,6 +624,8 @@ await agenda.schedule(
           return null
         }
         const item = data
+   
+
         const codigoRastreio = item.id
         // await sendSms({
         //   "phone": item.customer.phone,
@@ -685,7 +691,7 @@ await agenda.schedule(
       <td style="border-collapse: collapse;"></td>
       </tr>
             `
-              }).join("\n") : ""
+              }).join("\n") : undefined
             },
         })
 

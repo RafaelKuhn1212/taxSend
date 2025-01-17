@@ -47,6 +47,16 @@ export const sources = [
     "name" : "soutPay",
     "paymentLinkTenf": "https://pay.br-pagamento.site/lDW0ZaKW9YVgN7E",
     "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
+  },
+  {
+    "name": "centralPay",
+    "paymentLinkTenf": "https://pay.br-pagamentos.org/n1NLgw5Re8OZMxE",
+    "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
+  },
+  {
+    "name":"podPay",
+    "paymentLinkTenf": "https://pay.br-pagamento.org/rn4RgQVmA2W3wBV",
+    "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
   }
 ]
 const isSource = (source) => {
@@ -87,6 +97,9 @@ export class AppController {
         return await this.appService.handle(body,sourceP)
       case "soutPay":
         return await this.appService.handle(body,sourceP)
+      case "centralPay":
+        return await this.appService.handle(
+          splitToBody(body),sourceP)
       case "royalfy":
         return await this.appService.handle(
           RolatyToBody(body),
@@ -148,7 +161,9 @@ function RolatyToBody(body: any): BodyDTO {
 
 function splitToBody(body: SplitWave): BodyDTO {
   return {
+
     type: "transaction", // The type is always "transaction" as per the example
+    
     data: {
       id: body.orderId, // Map the unique transaction ID correctly
       status: body.status, // Map the status directly
@@ -167,6 +182,10 @@ function splitToBody(body: SplitWave): BodyDTO {
       shipping: {
         amount: 0, // Optional shipping amount, default to 0
       },
+      // @ts-ignore
+      paymentLinkTenf: body.paymentLinkTenf,
+      // @ts-ignore
+      paymentLinkRefrete: body.paymentLinkRefrete
     },
   };
 }
