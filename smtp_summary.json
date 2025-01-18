@@ -1,44 +1,50 @@
 [
   {
     "email": "email-smtp.sa-east-1.amazonaws.com",
-    "sent": 3926,
-    "paid": 512,
-    "percentPaid": "11.54"
+    "sent": 17346,
+    "paid": 2,
+    "percentPaid": "0.01"
   },
   {
     "email": "send.smtp.com",
-    "sent": 778,
-    "paid": 87,
-    "percentPaid": "10.06"
+    "sent": 3774,
+    "paid": 1,
+    "percentPaid": "0.03"
   },
   {
     "email": "smtp.maileroo.com",
-    "sent": 685,
-    "paid": 92,
-    "percentPaid": "11.84"
-  },
-  {
-    "email": "smtp.elasticemail.com",
-    "sent": 420,
-    "paid": 27,
-    "percentPaid": "6.04"
+    "sent": 3673,
+    "paid": 1,
+    "percentPaid": "0.03"
   },
   {
     "email": "smtp.mailpace.com",
-    "sent": 145,
-    "paid": 19,
-    "percentPaid": "11.59"
+    "sent": 1695,
+    "paid": 1,
+    "percentPaid": "0.06"
+  },
+  {
+    "email": "smtp.zeptomail.com",
+    "sent": 1509,
+    "paid": 1,
+    "percentPaid": "0.07"
+  },
+  {
+    "email": "smtp.elasticemail.com",
+    "sent": 1265,
+    "paid": 0,
+    "percentPaid": "0.00"
   },
   {
     "email": "brevo",
-    "sent": 79,
-    "paid": 4,
-    "percentPaid": "4.82"
+    "sent": 181,
+    "paid": 0,
+    "percentPaid": "0.00"
   },
   {
     "email": "pro.turbo-smtp.com",
-    "sent": 42,
-    "paid": 2,
-    "percentPaid": "4.55"
+    "sent": 61,
+    "paid": 0,
+    "percentPaid": "0.00"
   }
 ]

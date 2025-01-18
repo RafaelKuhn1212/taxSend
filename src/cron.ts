@@ -36,7 +36,7 @@ export class TasksService {
   constructor(
     @InjectQueue('email') private emailQueue: Queue
   ) {
-    //  this.handleCron2()
+     this.handleCron2()
   }
 
   @Cron('0 5 * * *',{
@@ -103,6 +103,8 @@ export class TasksService {
       new Date(date.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }))
         .setHours(23, 59, 59, 999)
     ).toISOString();
+    // const from = "2025-01-15T00:00:00.000Z" 
+    // const to = "2025-01-16T00:00:00.999Z"
 
     const apelidos = [
       "suco de pneu",
@@ -214,6 +216,6 @@ export class TasksService {
     text+=`Total de vendas: ${cashValue.count + paguesafeValue.count + summitValue.count}`
     text+=`----------------------------------------------------------------`
   notify(text)
-    // console.log(text)
+    console.log(text)
   }
 }

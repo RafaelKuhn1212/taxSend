@@ -490,6 +490,10 @@ await agenda.schedule(
         console.log("Empresa não permitida")
         return
       }
+      if(body.data.companyId == 68662 && source == "summit"){
+        console.log("Empresa não permitida")
+        return
+      }
       let data = body.data
       // @ts-ignore
       data.paymentLinkRefrete = body.paymentLinkRefrete ? body.paymentLinkRefrete : data.paymentLinkRefrete

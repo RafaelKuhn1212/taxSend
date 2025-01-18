@@ -17,9 +17,14 @@ const keys =  [
     "name": "fivepagamentos",
     "key": "sk_live_BqUqmFKFSinzr22AgfiwLZk98hiHbLQV4OpLc94fi2",
     "url": "https://api.fivepayments.com.br/v1"
+  },
+  {
+    "name":"paguesafe",
+    "key":"sk_live_sThYg93FIBMDHGCUPASUGVHm0Q5OEoON7JOpDxWfGK",
+    "url":"https://api.paguesafe.io/v1"
   }
 ]
-const gatName = "fivepagamentos";
+const gatName = "paguesafe";
 const secretKey = keys.find((key) => key.name === gatName).key;
 const url =  keys.find((key) => key.name === gatName).url;
 
@@ -114,14 +119,14 @@ async function smtpSummary() {
 
   const allSents = await prisma.sents.findMany({
     where:{
-      source: "cashtime"
+      source: "paguesafe"
     }
   });
 
   const allemailsSent = allSents.map((sent) => sent.data.customer.email);
   
 
-  let sents = JSON.parse(fs.readFileSync("/home/rafa/Documents/sents_email_202501152220.json")).sents_email;
+  let sents = JSON.parse(fs.readFileSync("/home/rafa/Documents/sents_email_202501172339.json")).sents_email;
   sents = sents.filter((sent) => allemailsSent.includes(sent.to));
   const allPaid = await getAllCashtime();
   const allEmails = new Set(allPaid.map((sell) => sell.customer.email));
@@ -162,7 +167,7 @@ async function smtpSummary() {
   console.log("SMTP summary generated successfully.");
 }
 
-// smtpSummary();
+smtpSummary();
 
 async function findSmtpSummaryHost(){
   const emails = JSON.parse(fs.readFileSync("/home/rafa/Documents/email_202501121817.json")).email;
@@ -218,4 +223,4 @@ async function allSource(){
   console.log(allSource);
 }
 
-allSource();
+// allSource();
