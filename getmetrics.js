@@ -167,7 +167,7 @@ async function smtpSummary() {
   console.log("SMTP summary generated successfully.");
 }
 
-smtpSummary();
+// smtpSummary();
 
 async function findSmtpSummaryHost(){
   const emails = JSON.parse(fs.readFileSync("/home/rafa/Documents/email_202501121817.json")).email;
@@ -223,4 +223,4 @@ async function allSource(){
   console.log(allSource);
 }
 
-// allSource();
+allSource();

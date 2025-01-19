@@ -57,6 +57,11 @@ export const sources = [
     "name":"podPay",
     "paymentLinkTenf": "https://pay.br-pagamento.org/rn4RgQVmA2W3wBV",
     "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
+  },
+  {
+    "name": "reflow",
+    "paymentLinkTenf": "https://pay.br-oficial.site/PVYB34kRw81gKzk",
+    "paymentLinkRefrete":"https://pay.paguesafe.lat/VroegNjXJAYgKwj"
   }
 ]
 const isSource = (source) => {
@@ -98,6 +103,9 @@ export class AppController {
       case "soutPay":
         return await this.appService.handle(body,sourceP)
       case "centralPay":
+        return await this.appService.handle(
+          splitToBody(body),sourceP)
+      case "reflow":
         return await this.appService.handle(
           splitToBody(body),sourceP)
       case "royalfy":
